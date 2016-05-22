@@ -1,0 +1,51 @@
+{
+  "name": "jaywalk",
+  "version": "0.0.0",
+  "description": "Runtime type validation",
+  "main": "dist/index.js",
+  "files": [
+    "dist/"
+  ],
+  "scripts": {
+    "lint": "tslint \"src/**/*.ts\" -e \"src/typings/**\"",
+    "build": "rm -rf dist && tsc",
+    "test-spec": "blue-tape \"dist/**/*.spec.js\" | tap-spec",
+    "test": "npm run lint && npm run build && npm run test-spec",
+    "prepublish": "typings install && npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/blakeembrey/jaywalk.git"
+  },
+  "keywords": [
+    "schema",
+    "json",
+    "validation",
+    "types",
+    "runtime",
+    "serialize"
+  ],
+  "author": {
+    "name": "Blake Embrey",
+    "email": "hello@blakeembrey.com",
+    "url": "http://blakeembrey.me"
+  },
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/blakeembrey/jaywalk/issues"
+  },
+  "homepage": "https://github.com/blakeembrey/jaywalk",
+  "devDependencies": {
+    "blue-tape": "^0.2.0",
+    "tap-spec": "^4.1.1",
+    "tslint": "^3.10.2",
+    "tslint-config-standard": "^1.2.2",
+    "typescript": "^1.8.10",
+    "typings": "^1.0.4"
+  },
+  "dependencies": {
+    "any-promise": "^1.3.0",
+    "make-error-cause": "^1.1.0",
+    "validator": "^5.2.0"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "resolution": {
+    "main": "src/typings"
+  },
+  "devDependencies": {
+    "blue-tape": "registry:npm/blue-tape#0.2.0+20160418015423"
+  },
+  "globalDependencies": {
+    "node": "registry:env/node#4.0.0+20160507210304"
+  },
+  "dependencies": {
+    "make-error-cause": "npm:make-error-cause",
+    "validator": "registry:npm/validator#4.5.1+20160429171724"
+  }
+}
