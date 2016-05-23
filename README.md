@@ -16,7 +16,7 @@ npm install jaywalk --save
 ## Usage
 
 ```ts
-import { Types, validate } from 'jaywalk'
+import { Types, compile } from 'jaywalk'
 
 const schema = new Types.Object({
   properties: {
@@ -24,15 +24,9 @@ const schema = new Types.Object({
   }
 })
 
-validate(schema, { username: 'hello' })
-  .then(
-    function (user) {
-      console.log(user)
-    },
-    function (err) {
-      console.log(err)
-    }
-  )
+const validate = compile(schema)
+
+validate({ username: 'hello' }).then(...)
 ```
 
 ## License

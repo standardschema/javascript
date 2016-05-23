@@ -1,7 +1,6 @@
 import validator = require('validator')
 import { String, StringOptions } from './string'
-import { ValidationError } from '../support/error'
-import { allowEmpty } from '../support/test'
+import { allowEmpty, ValidationContext } from '../support/test'
 
 export interface UriOptions extends StringOptions {}
 
@@ -17,9 +16,9 @@ export class Uri extends String {
 
 }
 
-function isUri (value: string, path: string[]) {
+function isUri (value: string, path: string[], context: ValidationContext) {
   if (!validator.isURL(value)) {
-    throw new ValidationError(path, 'type', 'uri', value)
+    throw context.error(path, 'type', 'uri', value)
   }
 
   return value

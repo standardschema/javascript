@@ -1,6 +1,5 @@
 import { Any, AnyOptions } from './any'
-import { ValidationError } from '../support/error'
-import { allowEmpty, identity, TestFn } from '../support/test'
+import { allowEmpty, identity, TestFn, ValidationContext } from '../support/test'
 
 export interface StringOptions extends AnyOptions {
   minLength?: number
@@ -38,9 +37,9 @@ export class String extends Any {
 
 }
 
-function isString <T> (value: T, path: string[]): T {
+function isString <T> (value: T, path: string[], context: ValidationContext): T {
   if (typeof value !== 'string') {
-    throw new ValidationError(path, 'type', 'string', value)
+    throw context.error(path, 'type', 'string', value)
   }
 
   return value
@@ -51,9 +50,9 @@ function toMinLengthTest (minLength: number | void): TestFn<string> {
     return identity
   }
 
-  return function (value: string, path: string[]) {
+  return function (value: string, path: string[], context: ValidationContext) {
     if (Buffer.byteLength(value) < minLength) {
-      throw new ValidationError(path, 'minLength', minLength, value)
+      throw context.error(path, 'minLength', minLength, value)
     }
 
     return value
@@ -65,9 +64,9 @@ function toMaxLengthTest (maxLength: number | void): TestFn<string> {
     return identity
   }
 
-  return function (value: string, path: string[]) {
+  return function (value: string, path: string[], context: ValidationContext) {
     if (Buffer.byteLength(value) > maxLength) {
-      throw new ValidationError(path, 'maxLength', maxLength, value)
+      throw context.error(path, 'maxLength', maxLength, value)
     }
 
     return value
@@ -81,9 +80,9 @@ function toPatternTest (pattern: string): TestFn<string> {
 
   const re = new RegExp(pattern)
 
-  return function (value: string, path: string[]) {
+  return function (value: string, path: string[], context: ValidationContext) {
     if (!re.test(value)) {
-      throw new ValidationError(path, 'pattern', pattern, value)
+      throw context.error(path, 'pattern', pattern, value)
     }
 
     return value

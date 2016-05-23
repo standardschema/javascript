@@ -1,7 +1,6 @@
 import { Any, AnyOptions } from './any'
 import { promiseEvery } from '../support/promises'
 import { allowEmpty, ValidationContext, wrap } from '../support/test'
-import { ValidationError } from '../support/error'
 
 export interface ObjectOptions extends AnyOptions {
   properties?: ObjectProperties
@@ -32,9 +31,9 @@ export class Object extends Any {
 /**
  * Validate the value is an object.
  */
-function isObject (value: any, path: string[]) {
+function isObject (value: any, path: string[], context: ValidationContext) {
   if (typeof value !== 'object') {
-    throw new ValidationError(path, 'type', 'object', value)
+    throw context.error(path, 'type', 'object', value)
   }
 
   return value

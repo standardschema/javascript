@@ -1,6 +1,5 @@
 import { Any, AnyOptions } from './any'
-import { ValidationError } from '../support/error'
-import { allowEmpty, identity, TestFn } from '../support/test'
+import { allowEmpty, identity, TestFn, ValidationContext } from '../support/test'
 
 export interface NumberOptions extends AnyOptions {
   min?: number
@@ -31,9 +30,9 @@ export class Number extends Any {
 
 }
 
-function isNumber <T> (value: T, path: string[]): T {
+function isNumber <T> (value: T, path: string[], context: ValidationContext): T {
   if (typeof value !== 'number') {
-    throw new ValidationError(path, 'type', 'number', value)
+    throw context.error(path, 'type', 'number', value)
   }
 
   return value
@@ -44,9 +43,9 @@ function toMinTest (min: number): TestFn<number> {
     return identity
   }
 
-  return function (value: number, path: string[]) {
+  return function (value: number, path: string[], context: ValidationContext) {
     if (value < min) {
-      throw new ValidationError(path, 'min', min, value)
+      throw context.error(path, 'min', min, value)
     }
 
     return value
@@ -58,9 +57,9 @@ function toMaxTest (max: number): TestFn<number> {
     return identity
   }
 
-  return function (value: number, path: string[]) {
+  return function (value: number, path: string[], context: ValidationContext) {
     if (value > max) {
-      throw new ValidationError(path, 'max', max, value)
+      throw context.error(path, 'max', max, value)
     }
 
     return value

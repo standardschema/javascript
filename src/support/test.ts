@@ -1,7 +1,6 @@
 import Promise = require('any-promise')
 
 import { Any } from '../types/any'
-import { MultiError } from '../support/error'
 
 /**
  * Noop. Return the input value.
@@ -35,26 +34,8 @@ export function allowEmpty <T> (test: TestFn<T>): TestFn<T> {
  */
 export interface ValidationContext {
   root: any
-  errors: Error[]
+  error: (path: string[], keyword: string, assertion: any, value: any) => void
   rootSchema: Any
-}
-
-/**
- * Convert a schema to a validation function.
- */
-export function compile (schema: Any) {
-  const test = wrap(schema)
-
-  return function <T> (value: T): Promise<T> {
-    // Create a validation context.
-    const context: ValidationContext = { root: value, rootSchema: schema, errors: [] }
-
-    return test(value, [], context)
-      .then(
-        () => value,
-        (err) => Promise.reject(new MultiError(context.errors))
-      )
-  }
 }
 
 /**
@@ -65,15 +46,8 @@ export function wrap (schema: Any) {
     // Run each test in order.
     function reducer <T> (result: Promise<T>, test: TestFn<T>): Promise<T> {
       return result.then(function (value: T) {
-        return Promise.resolve(test(value, path, context)).catch(collectError)
+        return test(value, path, context)
       })
-    }
-
-    // Wrap validation errors in a path.
-    function collectError (error: Error) {
-      context.errors.push(error)
-
-      return Promise.reject(error)
     }
 
     return schema._tests.reduce<Promise<T>>(reducer, Promise.resolve(value))

@@ -1,6 +1,5 @@
 import { Any, AnyOptions } from './any'
-import { ValidationError } from '../support/error'
-import { allowEmpty } from '../support/test'
+import { allowEmpty, ValidationContext } from '../support/test'
 
 export interface BooleanOptions extends AnyOptions {
 
@@ -18,9 +17,9 @@ export class Boolean extends Any {
 
 }
 
-function isBoolean <T> (value: T, path: string[]): T {
+function isBoolean <T> (value: T, path: string[], context: ValidationContext): T {
   if (typeof value !== 'boolean') {
-    throw new ValidationError(path, 'type', 'boolean', value)
+    throw context.error(path, 'type', 'boolean', value)
   }
 
   return value

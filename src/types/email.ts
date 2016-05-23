@@ -1,7 +1,6 @@
 import validator = require('validator')
 import { String, StringOptions } from './string'
-import { ValidationError } from '../support/error'
-import { allowEmpty } from '../support/test'
+import { allowEmpty, ValidationContext } from '../support/test'
 
 export interface EmailOptions extends StringOptions {}
 
@@ -17,9 +16,9 @@ export class Email extends String {
 
 }
 
-function isEmail (value: string, path: string[]) {
+function isEmail (value: string, path: string[], context: ValidationContext) {
   if (!validator.isEmail(value)) {
-    throw new ValidationError(path, 'type', 'email', value)
+    throw context.error(path, 'type', 'email', value)
   }
 
   return value

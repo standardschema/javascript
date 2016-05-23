@@ -1,6 +1,5 @@
 import assert = require('assert')
 import { Any, AnyOptions } from './any'
-import { ValidationError } from '../support/error'
 import { promiseEvery } from '../support/promises'
 import { allowEmpty, ValidationContext, wrap } from '../support/test'
 
@@ -26,9 +25,9 @@ export class Array extends Any {
 
 }
 
-function isArray <T> (value: T[], path: string[]): T[] {
+function isArray <T> (value: T[], path: string[], context: ValidationContext): T[] {
   if (!global.Array.isArray(value)) {
-    throw new ValidationError(path, 'type', 'array', value)
+    throw context.error(path, 'type', 'array', value)
   }
 
   return value

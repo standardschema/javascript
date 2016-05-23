@@ -1,6 +1,5 @@
 import assert = require('assert')
 import { identity, TestFn, allowEmpty, ValidationContext } from '../support/test'
-import { ValidationError } from '../support/error'
 import { getPath, relativePath } from '../support/path'
 
 export interface AnyOptions {
@@ -69,9 +68,9 @@ function toRequiredTest (required: boolean) {
     return identity
   }
 
-  return function <T> (value: T, path: string[]): T {
+  return function <T> (value: T, path: string[], context: ValidationContext): T {
     if (value == null) {
-      throw new ValidationError(path, 'required', required, value)
+      throw context.error(path, 'required', required, value)
     }
 
     return value
@@ -86,9 +85,9 @@ function toEnumTest (enums: any[]) {
     return identity
   }
 
-  return function <T> (value: T, path: string[]): T {
+  return function <T> (value: T, path: string[], context: ValidationContext): T {
     if (enums.indexOf(value) === -1) {
-      throw new ValidationError(path, 'enum', enums, value)
+      throw context.error(path, 'enum', enums, value)
     }
 
     return value

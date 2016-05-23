@@ -1,6 +1,5 @@
 import { Any, AnyOptions } from './any'
-import { ValidationError } from '../support/error'
-import { allowEmpty } from '../support/test'
+import { allowEmpty, ValidationContext } from '../support/test'
 
 const _toString = Object.prototype.toString
 
@@ -20,13 +19,13 @@ export class Date extends Any {
 
 }
 
-function isDate (value: any, path: string[]): Date {
+function isDate (value: any, path: string[], context: ValidationContext): Date {
   if (_toString.call(value) !== '[object Date]') {
-    throw new ValidationError(path, 'type', 'date', value)
+    throw context.error(path, 'type', 'date', value)
   }
 
   if (isNaN(value.getTime())) {
-    throw new ValidationError(path, 'type', 'date', value)
+    throw context.error(path, 'type', 'date', value)
   }
 
   return value
