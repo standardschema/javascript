@@ -1,8 +1,8 @@
 import Promise = require('any-promise')
 
-import * as Types from './types'
-import * as Formats from './formats'
-import * as Parsers from './parsers'
+import * as Types from './types/index'
+import * as Formats from './formats/index'
+import * as Parsers from './parsers/index'
 
 import { MultiError, ValidationError } from './support/error'
 import { wrap, ValidationContext } from './support/test'
