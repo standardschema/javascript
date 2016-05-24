@@ -10,7 +10,8 @@
     "lint": "tslint \"src/**/*.ts\" -e \"src/typings/**\"",
     "build": "rm -rf dist && tsc",
     "test-spec": "blue-tape \"dist/**/*.spec.js\" | tap-spec",
-    "test": "npm run lint && npm run build && npm run test-spec",
+    "test-cov": "istanbul cover --print none node_modules/blue-tape/bin/blue-tape.js -- \"dist/**/*.spec.js\" | tap-spec",
+    "test": "npm run lint && npm run build && npm run test-cov",
     "prepublish": "typings install && npm run build"
   },
   "repository": {
@@ -37,6 +38,7 @@
   "homepage": "https://github.com/blakeembrey/jaywalk",
   "devDependencies": {
     "blue-tape": "^0.2.0",
+    "istanbul": "^0.4.3",
     "tap-spec": "^4.1.1",
     "tslint": "^3.10.2",
     "tslint-config-standard": "^1.2.2",
