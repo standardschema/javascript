@@ -31,9 +31,9 @@ export function compile (rootSchema: Types.Any) {
     }
 
     return test(root, [], context)
-      .then(
-        () => root,
-        () => Promise.reject(new MultiError(errors))
-      )
+      .then(() => root)
+      .catch((error) => {
+        return Promise.reject(errors.length ? new MultiError(errors) : error)
+      })
   }
 }

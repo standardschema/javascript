@@ -1,9 +1,10 @@
 import { Any, AnyOptions } from './any'
 import { promiseEvery } from '../support/promises'
-import { allowEmpty, ValidationContext, wrap } from '../support/test'
+import { allowEmpty, ValidationContext, wrap, TestFn } from '../support/test'
 
 export interface ObjectOptions extends AnyOptions {
   properties?: ObjectProperties
+  patterns?: ObjectProperties
 }
 
 export interface ObjectProperties {
@@ -14,6 +15,7 @@ export class Object extends Any {
 
   type = 'object'
   properties: ObjectProperties = {}
+  patterns: ObjectProperties = {}
 
   constructor (options: ObjectOptions) {
     super(options)
@@ -22,8 +24,12 @@ export class Object extends Any {
       this.properties = options.properties
     }
 
+    if (options.patterns != null) {
+      this.patterns = options.patterns
+    }
+
     this._tests.push(allowEmpty(isObject))
-    this._tests.push(allowEmpty(toPropertiesTest(this.properties)))
+    this._tests.push(allowEmpty(toPropertiesTest(this.properties, this.patterns)))
   }
 
 }
@@ -42,18 +48,38 @@ function isObject (value: any, path: string[], context: ValidationContext) {
 /**
  * Test all properties in an object definition.
  */
-function toPropertiesTest (properties: ObjectProperties) {
-  const keys = global.Object.keys(properties)
-  const propertyTests = zip(keys, keys.map(key => wrap(properties[key])))
+function toPropertiesTest (properties: ObjectProperties, patterns: ObjectProperties) {
+  const patternTests = global.Object.keys(patterns)
+    .map<[RegExp, TestFn<any>]>(key => {
+      return [new RegExp(key), wrap(patterns[key])]
+    })
+
+  const propertyTests = global.Object.keys(properties)
+    .map<[string, TestFn<any>]>(key => {
+      return [key, wrap(properties[key])]
+    })
 
   return function (object: any, path: string[], context: ValidationContext) {
+    const keys = global.Object.keys(object)
+
     // TODO(blakeembrey): Validate _all_ keys when intersection is corrected.
     return promiseEvery(keys.map(function (key) {
       return function () {
-        const test = propertyTests[key]
         const value = object[key]
 
-        return test(value, path.concat(key), context)
+        for (const [prop, test] of propertyTests) {
+          if (prop === key) {
+            return test(value, path.concat(key), context)
+          }
+        }
+
+        for (const [match, test] of patternTests) {
+          if (match.test(key)) {
+            return test(value, path.concat(key), context)
+          }
+        }
+
+        // TODO: Throw an error when property does not match.
       }
     })).then((values) => zip(keys, values))
   }

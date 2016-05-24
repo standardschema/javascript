@@ -36,7 +36,7 @@ export function promiseEvery <T> (fns: Array<() => Promise<T>>): Promise<T[]> {
 
     // Handle each of the function results.
     function handle (result: Promise<any>, index: number) {
-      return result.then(
+      return Promise.resolve(result).then(
         function (result) {
           results[index] = result
 
