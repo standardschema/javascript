@@ -3,12 +3,13 @@ import Promise = require('any-promise')
 import * as Types from './types/index'
 import * as Formats from './formats/index'
 import * as Parsers from './parsers/index'
+import * as utils from './utils'
 
 import { MultiError, ValidationError } from './support/error'
 import { wrap, ValidationContext } from './support/test'
 
 // Export built-ins.
-export { Types, Formats, Parsers }
+export { Types, Formats, Parsers, utils }
 
 /**
  * Convert a schema to a validation function.

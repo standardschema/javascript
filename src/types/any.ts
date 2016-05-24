@@ -1,6 +1,6 @@
 import assert = require('assert')
 import { identity, TestFn, allowEmpty, ValidationContext } from '../support/test'
-import { getPath, relativePath } from '../support/path'
+import { getPath, relativePath } from '../utils'
 
 export interface AnyOptions {
   required?: boolean
