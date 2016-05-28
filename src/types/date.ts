@@ -1,5 +1,5 @@
 import { Any, AnyOptions } from './any'
-import { allowEmpty, ValidationContext } from '../support/test'
+import { skipEmpty, Context } from '../utils'
 
 const _toString = Object.prototype.toString
 
@@ -14,12 +14,12 @@ export class Date extends Any {
   constructor (options: DateOptions = {}) {
     super(options)
 
-    this._tests.push(allowEmpty(isDate))
+    this._tests.push(skipEmpty(isDate))
   }
 
 }
 
-function isDate (value: any, path: string[], context: ValidationContext): Date {
+function isDate (value: any, path: string[], context: Context): Date {
   if (_toString.call(value) !== '[object Date]') {
     throw context.error(path, 'type', 'date', value)
   }

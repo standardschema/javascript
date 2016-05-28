@@ -1,7 +1,7 @@
 import assert = require('assert')
 import { Any, AnyOptions } from './any'
 import { promiseEvery } from '../support/promises'
-import { allowEmpty, ValidationContext, wrap } from '../support/test'
+import { skipEmpty, Context, compose } from '../utils'
 
 export interface TupleOptions extends AnyOptions {
   tuple: Any[]
@@ -19,15 +19,15 @@ export class Tuple extends Any {
 
     this.tuple = options.tuple
 
-    this._tests.push(allowEmpty(toTupleTest(options.tuple)))
+    this._tests.push(skipEmpty(toTupleTest(options.tuple)))
   }
 
 }
 
 function toTupleTest (tuple: Any[]) {
-  const tests = tuple.map(type => wrap(type))
+  const tests = tuple.map(type => compose(type._tests))
 
-  return function <T> (values: T[], path: string[], context: ValidationContext) {
+  return function <T> (values: T[], path: string[], context: Context) {
     return promiseEvery(tests.map(function (test, index) {
       return function () {
         const value = values[index]

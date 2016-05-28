@@ -1,6 +1,6 @@
 import { Any, AnyOptions } from './any'
-import { allowEmpty, ValidationContext, wrap } from '../support/test'
 import { promiseEvery } from '../support/promises'
+import { skipEmpty, Context, compose } from '../utils'
 
 export interface IntersectionOptions extends AnyOptions {
   types: Any[]
@@ -16,15 +16,17 @@ export class Intersection extends Any {
 
     this.types = options.types
 
-    this._tests.push(allowEmpty(toItemsValidation(options.types)))
+    this._tests.push(skipEmpty(toItemsValidation(options.types)))
   }
 
 }
 
 function toItemsValidation (types: Any[]) {
-  return function <T> (value: T, path: string[], context: ValidationContext) {
-    return promiseEvery(types.map((validation) => {
-      return () => wrap(validation)(value, path, context)
+  const tests = types.map(type => compose(type._tests))
+
+  return function <T> (value: T, path: string[], context: Context) {
+    return promiseEvery(tests.map((test) => {
+      return () => test(value, path, context)
     }))
   }
 }

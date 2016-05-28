@@ -1,5 +1,5 @@
 import { Any, AnyOptions } from './any'
-import { allowEmpty, identity, TestFn, ValidationContext } from '../support/test'
+import { skipEmpty, identity, TestFn, Context } from '../utils'
 
 export interface StringOptions extends AnyOptions {
   minLength?: number
@@ -29,15 +29,15 @@ export class String extends Any {
       this.pattern = options.pattern
     }
 
-    this._tests.push(allowEmpty(isString))
-    this._tests.push(allowEmpty(toPatternTest(this.pattern)))
-    this._tests.push(allowEmpty(toMinLengthTest(this.minLength)))
-    this._tests.push(allowEmpty(toMaxLengthTest(this.maxLength)))
+    this._tests.push(skipEmpty(isString))
+    this._tests.push(skipEmpty(toPatternTest(this.pattern)))
+    this._tests.push(skipEmpty(toMinLengthTest(this.minLength)))
+    this._tests.push(skipEmpty(toMaxLengthTest(this.maxLength)))
   }
 
 }
 
-function isString <T> (value: T, path: string[], context: ValidationContext): T {
+function isString <T> (value: T, path: string[], context: Context): T {
   if (typeof value !== 'string') {
     throw context.error(path, 'type', 'string', value)
   }
@@ -50,7 +50,7 @@ function toMinLengthTest (minLength: number | void): TestFn<string> {
     return identity
   }
 
-  return function (value: string, path: string[], context: ValidationContext) {
+  return function (value: string, path: string[], context: Context) {
     if (Buffer.byteLength(value) < minLength) {
       throw context.error(path, 'minLength', minLength, value)
     }
@@ -64,7 +64,7 @@ function toMaxLengthTest (maxLength: number | void): TestFn<string> {
     return identity
   }
 
-  return function (value: string, path: string[], context: ValidationContext) {
+  return function (value: string, path: string[], context: Context) {
     if (Buffer.byteLength(value) > maxLength) {
       throw context.error(path, 'maxLength', maxLength, value)
     }
@@ -80,7 +80,7 @@ function toPatternTest (pattern: string): TestFn<string> {
 
   const re = new RegExp(pattern)
 
-  return function (value: string, path: string[], context: ValidationContext) {
+  return function (value: string, path: string[], context: Context) {
     if (!re.test(value)) {
       throw context.error(path, 'pattern', pattern, value)
     }

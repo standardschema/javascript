@@ -8,7 +8,7 @@ const IS_VALID_IDENTIFIER = /^[A-Za-z_$][A-Za-z0-9_$]*$/
 export class ValidationError extends makeError.BaseError {
 
   constructor (public path: string[], public keyword: string, public assertion: any, public value: any) {
-    super(`Validation failed for "${keyword}" at "${toPath(path)}"`)
+    super(`Validation failed for "${keyword}" at "${format(path)}"`)
   }
 
 }
@@ -27,7 +27,7 @@ export class MultiError extends makeError.BaseError {
 /**
  * Compile a path array to property path string.
  */
-function toPath (segments: string[]): string {
+function format (segments: string[]): string {
   let result = ''
 
   segments.forEach(function (segment, index) {

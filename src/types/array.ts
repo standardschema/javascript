@@ -1,7 +1,7 @@
 import assert = require('assert')
 import { Any, AnyOptions } from './any'
+import { skipEmpty, Context, compose } from '../utils'
 import { promiseEvery } from '../support/promises'
-import { allowEmpty, ValidationContext, wrap } from '../support/test'
 
 export interface ArrayOptions extends AnyOptions {
   items: Any
@@ -19,13 +19,13 @@ export class Array extends Any {
 
     this.items = options.items
 
-    this._tests.push(allowEmpty(isArray))
-    this._tests.push(allowEmpty(toItemTest(options.items)))
+    this._tests.push(skipEmpty(isArray))
+    this._tests.push(skipEmpty(toItemTest(this.items)))
   }
 
 }
 
-function isArray <T> (value: T[], path: string[], context: ValidationContext): T[] {
+function isArray <T> (value: T[], path: string[], context: Context): T[] {
   if (!global.Array.isArray(value)) {
     throw context.error(path, 'type', 'array', value)
   }
@@ -33,10 +33,10 @@ function isArray <T> (value: T[], path: string[], context: ValidationContext): T
   return value
 }
 
-function toItemTest (item: Any) {
-  const test = wrap(item)
+function toItemTest (schema: Any) {
+  const test = compose(schema._tests)
 
-  return function <T> (value: T[], path: string[], context: ValidationContext) {
+  return function <T> (value: T[], path: string[], context: Context) {
     return promiseEvery<T>(value.map((value: T, index: number) => {
       return () => test(value, path.concat(String(index)), context)
     }))

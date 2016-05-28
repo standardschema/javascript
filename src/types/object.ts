@@ -1,6 +1,6 @@
 import { Any, AnyOptions } from './any'
 import { promiseEvery } from '../support/promises'
-import { allowEmpty, ValidationContext, wrap, TestFn } from '../support/test'
+import { skipEmpty, Context, TestFn, compose } from '../utils'
 
 export interface ObjectOptions extends AnyOptions {
   properties?: ObjectProperties
@@ -28,8 +28,8 @@ export class Object extends Any {
       this.patterns = options.patterns
     }
 
-    this._tests.push(allowEmpty(isObject))
-    this._tests.push(allowEmpty(toPropertiesTest(this.properties, this.patterns)))
+    this._tests.push(skipEmpty(isObject))
+    this._tests.push(skipEmpty(toPropertiesTest(this.properties, this.patterns)))
   }
 
 }
@@ -37,7 +37,7 @@ export class Object extends Any {
 /**
  * Validate the value is an object.
  */
-function isObject (value: any, path: string[], context: ValidationContext) {
+function isObject (value: any, path: string[], context: Context) {
   if (typeof value !== 'object') {
     throw context.error(path, 'type', 'object', value)
   }
@@ -51,15 +51,15 @@ function isObject (value: any, path: string[], context: ValidationContext) {
 function toPropertiesTest (properties: ObjectProperties, patterns: ObjectProperties) {
   const patternTests = global.Object.keys(patterns)
     .map<[RegExp, TestFn<any>]>(key => {
-      return [new RegExp(key), wrap(patterns[key])]
+      return [new RegExp(key), compose(patterns[key]._tests)]
     })
 
   const propertyTests = global.Object.keys(properties)
     .map<[string, TestFn<any>]>(key => {
-      return [key, wrap(properties[key])]
+      return [key, compose(properties[key]._tests)]
     })
 
-  return function (object: any, path: string[], context: ValidationContext) {
+  return function (object: any, path: string[], context: Context) {
     const keys = global.Object.keys(object)
 
     // TODO(blakeembrey): Validate _all_ keys when intersection is corrected.

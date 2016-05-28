@@ -1,5 +1,5 @@
-import { Types, compile } from '../index'
 import test = require('blue-tape')
+import { Types, compile } from '../index'
 
 test('object', t => {
   t.test('properties', t => {

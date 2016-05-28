@@ -1,25 +1,24 @@
 import assert = require('assert')
-import { identity, TestFn, allowEmpty, ValidationContext } from '../support/test'
-import { getPath, relativePath } from '../utils'
+import { getPath, relativePath, identity, Context, TestFn, compose } from '../utils'
 
 export interface AnyOptions {
   required?: boolean
-  enum?: any[]
   default?: any
   ref?: string[]
   description?: string
   meta?: any
+  uses?: Any[]
 }
 
 export class Any {
 
   type = 'any'
   required = true
-  enum: any[]
   default: any
   ref: string[]
   description: string
   meta: any = {}
+  uses: Any[] = []
 
   _tests: Array<TestFn<any>> = []
 
@@ -38,12 +37,6 @@ export class Any {
       assert.ok(typeof this.required === 'boolean', `Expected "required" to be a boolean`)
     }
 
-    if (options.enum != null) {
-      this.enum = options.enum
-
-      assert.ok(Array.isArray(this.enum), `Expected "enum" to be an array`)
-    }
-
     if (options.description != null) {
       this.description = options.description
     }
@@ -52,10 +45,14 @@ export class Any {
       this.meta = options.meta
     }
 
+    if (options.uses != null) {
+      this.uses = options.uses
+    }
+
     this._tests.push(toRefTest(this.ref))
     this._tests.push(toDefaultTest(this.default))
     this._tests.push(toRequiredTest(this.required))
-    this._tests.push(allowEmpty(toEnumTest(this.enum)))
+    this._tests.push(toUsesTest(this.uses))
   }
 
 }
@@ -68,26 +65,9 @@ function toRequiredTest (required: boolean) {
     return identity
   }
 
-  return function <T> (value: T, path: string[], context: ValidationContext): T {
+  return function <T> (value: T, path: string[], context: Context): T {
     if (value == null) {
       throw context.error(path, 'required', required, value)
-    }
-
-    return value
-  }
-}
-
-/**
- * Generate an enum check function.
- */
-function toEnumTest (enums: any[]) {
-  if (enums == null) {
-    return identity
-  }
-
-  return function <T> (value: T, path: string[], context: ValidationContext): T {
-    if (enums.indexOf(value) === -1) {
-      throw context.error(path, 'enum', enums, value)
     }
 
     return value
@@ -111,7 +91,18 @@ function toRefTest (ref: string[]) {
     return identity
   }
 
-  return function (value: any, path: string[], context: ValidationContext) {
+  return function (value: any, path: string[], context: Context) {
     return getPath(context.root, relativePath(path, ref))
   }
+}
+
+/**
+ * Execute on a list of types.
+ */
+function toUsesTest (uses: Any[]): TestFn<any> {
+  if (uses.length === 0) {
+    return identity
+  }
+
+  return compose(uses.map(type => compose(type._tests)))
 }

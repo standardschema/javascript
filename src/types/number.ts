@@ -1,5 +1,5 @@
 import { Any, AnyOptions } from './any'
-import { allowEmpty, identity, TestFn, ValidationContext } from '../support/test'
+import { skipEmpty, identity, TestFn, Context } from '../utils'
 
 export interface NumberOptions extends AnyOptions {
   min?: number
@@ -23,14 +23,14 @@ export class Number extends Any {
       this.max = options.max
     }
 
-    this._tests.push(allowEmpty(isNumber))
-    this._tests.push(allowEmpty(toMinTest(this.min)))
-    this._tests.push(allowEmpty(toMaxTest(this.max)))
+    this._tests.push(skipEmpty(isNumber))
+    this._tests.push(skipEmpty(toMinTest(this.min)))
+    this._tests.push(skipEmpty(toMaxTest(this.max)))
   }
 
 }
 
-function isNumber <T> (value: T, path: string[], context: ValidationContext): T {
+function isNumber <T> (value: T, path: string[], context: Context): T {
   if (typeof value !== 'number') {
     throw context.error(path, 'type', 'number', value)
   }
@@ -43,7 +43,7 @@ function toMinTest (min: number): TestFn<number> {
     return identity
   }
 
-  return function (value: number, path: string[], context: ValidationContext) {
+  return function (value: number, path: string[], context: Context) {
     if (value < min) {
       throw context.error(path, 'min', min, value)
     }
@@ -57,7 +57,7 @@ function toMaxTest (max: number): TestFn<number> {
     return identity
   }
 
-  return function (value: number, path: string[], context: ValidationContext) {
+  return function (value: number, path: string[], context: Context) {
     if (value > max) {
       throw context.error(path, 'max', max, value)
     }

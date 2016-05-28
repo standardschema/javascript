@@ -1,5 +1,5 @@
 import { Any, AnyOptions } from './any'
-import { allowEmpty, ValidationContext } from '../support/test'
+import { skipEmpty, Context } from '../utils'
 
 export interface BooleanOptions extends AnyOptions {
 
@@ -12,12 +12,15 @@ export class Boolean extends Any {
   constructor (options: BooleanOptions = {}) {
     super(options)
 
-    this._tests.push(allowEmpty(isBoolean))
+    this._tests.push(skipEmpty(isBoolean))
   }
 
 }
 
-function isBoolean <T> (value: T, path: string[], context: ValidationContext): T {
+/**
+ * Run a boolean value check.
+ */
+function isBoolean <T> (value: T, path: string[], context: Context): T {
   if (typeof value !== 'boolean') {
     throw context.error(path, 'type', 'boolean', value)
   }
