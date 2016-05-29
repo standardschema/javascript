@@ -12,7 +12,7 @@ export interface AnyOptions {
 
 export class Any {
 
-  type = 'any'
+  type = 'Any'
   required = true
   default: any
   ref: string[]
@@ -53,6 +53,20 @@ export class Any {
     this._tests.push(toDefaultTest(this.default))
     this._tests.push(toRequiredTest(this.required))
     this._tests.push(toUsesTest(this.uses))
+  }
+
+  /**
+   * Structural type-check for serialisation/deserialisation.
+   */
+  _isType (value: any) {
+    return true
+  }
+
+  /**
+   * Check whether a type is a sub-type of this type.
+   */
+  _typeOf (other: Any) {
+    return other instanceof this.constructor
   }
 
 }

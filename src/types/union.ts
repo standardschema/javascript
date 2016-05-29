@@ -8,7 +8,7 @@ export interface UnionOptions {
 
 export class Union extends Any {
 
-  type = 'union'
+  type = 'Union'
   types: Any[]
 
   constructor (options: UnionOptions) {
@@ -17,6 +17,12 @@ export class Union extends Any {
     this.types = options.types
 
     this._tests.push(skipEmpty(toItemsTest(this.types)))
+  }
+
+  _isType (value: any) {
+    return this.types.some(function (type) {
+      return type._isType(value)
+    })
   }
 
 }

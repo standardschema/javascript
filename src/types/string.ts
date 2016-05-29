@@ -9,7 +9,7 @@ export interface StringOptions extends AnyOptions {
 
 export class String extends Any {
 
-  type = 'string'
+  type = 'String'
   minLength: number
   maxLength: number
   pattern: string
@@ -33,6 +33,10 @@ export class String extends Any {
     this._tests.push(skipEmpty(toPatternTest(this.pattern)))
     this._tests.push(skipEmpty(toMinLengthTest(this.minLength)))
     this._tests.push(skipEmpty(toMaxLengthTest(this.maxLength)))
+  }
+
+  _isType (value: any) {
+    return typeof value === 'string'
   }
 
 }

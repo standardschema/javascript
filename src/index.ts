@@ -31,8 +31,6 @@ export function compile (rootSchema: Types.Any) {
     }
 
     return test(root, [], context)
-      // TODO: Remove this when intersection types stop removing additional keys.
-      .then(() => root)
       .catch((error) => {
         return Promise.reject(errors.length ? new MultiError(errors) : error)
       })

@@ -6,7 +6,7 @@ export interface EmailOptions extends StringOptions {}
 
 export class Email extends String {
 
-  type = 'email'
+  type = 'Email'
 
   constructor (options: EmailOptions = {}) {
     super(options)

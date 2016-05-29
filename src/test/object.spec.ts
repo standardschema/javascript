@@ -26,24 +26,30 @@ test('object', t => {
     })
   })
 
-  t.test('patterns', t => {
+  t.test('property types', t => {
     const schema = new Types.Object({
-      patterns: {
-        '^[0-9]+$': new Types.String()
-      }
+      propertyTypes: [
+        [
+          new Types.String({ pattern: '^[0-9]+$' }),
+          new Types.String()
+        ]
+      ]
     })
 
     const validate = compile(schema)
 
-    t.test('accept valid patterns', t => {
+    t.test('accept valid property types', t => {
       return validate({ '123': '123' })
+        .then(function (res) {
+          t.equal(res[123], '123')
+        })
     })
 
-    t.test('error on bad pattern properties', t => {
+    t.test('error on bad property type check', t => {
       t.plan(2)
 
       return validate({ '123': 123 })
-        .catch(err => {
+        .catch(function (err) {
           t.equal(err.errors.length, 1)
           t.deepEqual(err.errors[0].path, ['123'])
         })

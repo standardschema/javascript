@@ -9,13 +9,13 @@ export interface TupleOptions extends AnyOptions {
 
 export class Tuple extends Any {
 
-  type = 'tuple'
+  type = 'Tuple'
   tuple: Any[]
 
   constructor (options: TupleOptions) {
     super(options)
 
-    assert.ok(Array.isArray(options.tuple), 'Expected "items" to be an array of types')
+    assert.ok(Array.isArray(options.tuple), 'Expected "tuple" to be a list of types')
 
     this.tuple = options.tuple
 

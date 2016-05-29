@@ -9,7 +9,7 @@ export interface ArrayOptions extends AnyOptions {
 
 export class Array extends Any {
 
-  type = 'array'
+  type = 'Array'
   items: Any
 
   constructor (options: ArrayOptions) {
@@ -21,6 +21,10 @@ export class Array extends Any {
 
     this._tests.push(skipEmpty(isArray))
     this._tests.push(skipEmpty(toItemTest(this.items)))
+  }
+
+  _isType (value: any) {
+    return global.Array.isArray(value)
   }
 
 }

@@ -8,7 +8,7 @@ export interface NumberOptions extends AnyOptions {
 
 export class Number extends Any {
 
-  type = 'number'
+  type = 'Number'
   min: number
   max: number
 
@@ -26,6 +26,10 @@ export class Number extends Any {
     this._tests.push(skipEmpty(isNumber))
     this._tests.push(skipEmpty(toMinTest(this.min)))
     this._tests.push(skipEmpty(toMaxTest(this.max)))
+  }
+
+  _isType (value: any) {
+    return typeof value === 'boolean'
   }
 
 }

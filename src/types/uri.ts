@@ -6,7 +6,7 @@ export interface UriOptions extends StringOptions {}
 
 export class Uri extends String {
 
-  type = 'uri'
+  type = 'Uri'
 
   constructor (options: UriOptions = {}) {
     super(options)

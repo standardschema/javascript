@@ -7,12 +7,16 @@ export interface BooleanOptions extends AnyOptions {
 
 export class Boolean extends Any {
 
-  type = 'boolean'
+  type = 'Boolean'
 
   constructor (options: BooleanOptions = {}) {
     super(options)
 
     this._tests.push(skipEmpty(isBoolean))
+  }
+
+  _isType (value: any) {
+    return typeof value === 'boolean'
   }
 
 }

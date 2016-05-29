@@ -9,7 +9,7 @@ export interface DateOptions extends AnyOptions {
 
 export class Date extends Any {
 
-  type = 'date'
+  type = 'Date'
 
   constructor (options: DateOptions = {}) {
     super(options)
@@ -17,15 +17,19 @@ export class Date extends Any {
     this._tests.push(skipEmpty(isDate))
   }
 
+  _isType (value: any) {
+    return _toString.call(value) === '[object Date]'
+  }
+
 }
 
 function isDate (value: any, path: string[], context: Context): Date {
   if (_toString.call(value) !== '[object Date]') {
-    throw context.error(path, 'type', 'date', value)
+    throw context.error(path, 'type', 'Date', value)
   }
 
   if (isNaN(value.getTime())) {
-    throw context.error(path, 'type', 'date', value)
+    throw context.error(path, 'type', 'Date', value)
   }
 
   return value
