@@ -121,7 +121,9 @@ function pairs (pairs: Array<[string, any]>) {
   const result: any = {}
 
   for (const [key, value] of pairs) {
-    result[key] = value
+    if (typeof value !== 'undefined') {
+      result[key] = value
+    }
   }
 
   return result
