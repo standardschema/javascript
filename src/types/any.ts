@@ -1,5 +1,5 @@
 import assert = require('assert')
-import { getPath, relativePath, identity, Context, TestFn, compose } from '../utils'
+import { identity, Context, TestFn, compose } from '../utils'
 
 export interface AnyOptions {
   required?: boolean
@@ -15,7 +15,6 @@ export class Any {
   type = 'Any'
   required = true
   default: any
-  ref: string[]
   description: string
   meta: any = {}
   uses: Any[] = []
@@ -25,10 +24,6 @@ export class Any {
   constructor (options: AnyOptions = {}) {
     if (options.default != null) {
       this.default = options.default
-    }
-
-    if (options.ref != null) {
-      this.ref = options.ref
     }
 
     if (options.required != null) {
@@ -49,7 +44,6 @@ export class Any {
       this.uses = options.uses
     }
 
-    this._tests.push(toRefTest(this.ref))
     this._tests.push(toDefaultTest(this.default))
     this._tests.push(toRequiredTest(this.required))
     this._tests.push(toUsesTest(this.uses))
@@ -94,19 +88,6 @@ function toRequiredTest (required: boolean) {
 function toDefaultTest (defaulted: any) {
   return function (value: any) {
     return value == null ? defaulted : value
-  }
-}
-
-/**
- * Convert the ref to a value.
- */
-function toRefTest (ref: string[]) {
-  if (ref == null) {
-    return identity
-  }
-
-  return function (value: any, path: string[], context: Context) {
-    return getPath(context.root, relativePath(path, ref))
   }
 }
 
