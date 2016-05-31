@@ -43,7 +43,7 @@ export class String extends Any {
 
 function isString <T> (value: T, path: string[], context: Context): T {
   if (typeof value !== 'string') {
-    throw context.error(path, 'type', 'string', value)
+    throw context.error(path, 'type', 'String', value)
   }
 
   return value

@@ -29,14 +29,14 @@ export class Number extends Any {
   }
 
   _isType (value: any) {
-    return typeof value === 'boolean'
+    return typeof value === 'number'
   }
 
 }
 
 function isNumber <T> (value: T, path: string[], context: Context): T {
   if (typeof value !== 'number') {
-    throw context.error(path, 'type', 'number', value)
+    throw context.error(path, 'type', 'Number', value)
   }
 
   return value

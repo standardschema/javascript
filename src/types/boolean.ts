@@ -26,7 +26,7 @@ export class Boolean extends Any {
  */
 function isBoolean <T> (value: T, path: string[], context: Context): T {
   if (typeof value !== 'boolean') {
-    throw context.error(path, 'type', 'boolean', value)
+    throw context.error(path, 'type', 'Boolean', value)
   }
 
   return value

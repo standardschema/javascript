@@ -31,7 +31,7 @@ export class Array extends Any {
 
 function isArray <T> (value: T[], path: string[], context: Context): T[] {
   if (!global.Array.isArray(value)) {
-    throw context.error(path, 'type', 'array', value)
+    throw context.error(path, 'type', 'Array', value)
   }
 
   return value

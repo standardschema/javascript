@@ -18,7 +18,7 @@ export class Email extends String {
 
 function isEmail (value: string, path: string[], context: Context) {
   if (!validator.isEmail(value)) {
-    throw context.error(path, 'type', 'email', value)
+    throw context.error(path, 'type', 'Email', value)
   }
 
   return value

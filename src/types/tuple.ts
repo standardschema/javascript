@@ -22,6 +22,10 @@ export class Tuple extends Any {
     this._tests.push(skipEmpty(toTupleTest(options.tuple)))
   }
 
+  _isType (value: any) {
+    return value.length === this.tuple.length
+  }
+
 }
 
 function toTupleTest (tuple: Any[]) {

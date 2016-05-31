@@ -66,7 +66,7 @@ export class Object extends Any {
  */
 function isObject (value: any, path: string[], context: Context) {
   if (typeof value !== 'object') {
-    throw context.error(path, 'type', 'object', value)
+    throw context.error(path, 'type', 'Object', value)
   }
 
   return value

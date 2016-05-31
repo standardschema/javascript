@@ -29,7 +29,7 @@ export class Whitelist extends Any {
 function toWhitelistTest (accept: any[]) {
   return function (value: any, path: string[], context: Context) {
     if (accept.indexOf(value) === -1) {
-      throw context.error(path, 'accept', accept, value)
+      throw context.error(path, 'whitelist', accept, value)
     }
 
     return value
