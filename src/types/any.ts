@@ -4,7 +4,6 @@ import { identity, Context, TestFn, compose } from '../utils'
 export interface AnyOptions {
   required?: boolean
   default?: any
-  ref?: string[]
   description?: string
   meta?: any
   uses?: Any[]
