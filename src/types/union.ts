@@ -1,15 +1,15 @@
-import { Any } from './any'
+import { Rule } from './rule'
 import { promiseAny } from '../support/promises'
 import { skipEmpty, Context, compose } from '../utils'
 
 export interface UnionOptions {
-  types: Any[]
+  types: Rule[]
 }
 
-export class Union extends Any {
+export class Union extends Rule implements UnionOptions {
 
   type = 'Union'
-  types: Any[]
+  types: Rule[]
 
   constructor (options: UnionOptions) {
     super(options)
@@ -30,7 +30,7 @@ export class Union extends Any {
 /**
  * Find one item that passes the tests.
  */
-function toItemsTest (types: Any[]) {
+function toItemsTest (types: Rule[]) {
   const tests = types.map(type => compose(type._tests))
 
   return function <T> (value: T, path: string[], context: Context) {

@@ -1,16 +1,17 @@
 import assert = require('assert')
+import { Rule } from './rule'
 import { Any, AnyOptions } from './any'
 import { skipEmpty, Context, compose } from '../utils'
 import { promiseEvery } from '../support/promises'
 
 export interface ArrayOptions extends AnyOptions {
-  items: Any
+  items: Rule
 }
 
-export class Array extends Any {
+export class Array extends Any implements ArrayOptions {
 
   type = 'Array'
-  items: Any
+  items: Rule
 
   constructor (options: ArrayOptions) {
     super(options)
@@ -37,7 +38,7 @@ function isArray <T> (value: T[], path: string[], context: Context): T[] {
   return value
 }
 
-function toItemTest (schema: Any) {
+function toItemTest (schema: Rule) {
   const test = compose(schema._tests)
 
   return function <T> (value: T[], path: string[], context: Context) {

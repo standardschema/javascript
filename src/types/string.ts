@@ -7,7 +7,7 @@ export interface StringOptions extends AnyOptions {
   pattern?: string
 }
 
-export class String extends Any {
+export class String extends Any implements StringOptions {
 
   type = 'String'
   minLength: number

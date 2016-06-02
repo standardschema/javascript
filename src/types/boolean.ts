@@ -5,7 +5,7 @@ export interface BooleanOptions extends AnyOptions {
 
 }
 
-export class Boolean extends Any {
+export class Boolean extends Any implements BooleanOptions {
 
   type = 'Boolean'
 

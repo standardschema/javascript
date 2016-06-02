@@ -7,7 +7,7 @@ export interface DateOptions extends AnyOptions {
 
 }
 
-export class Date extends Any {
+export class Date extends Any implements DateOptions {
 
   type = 'Date'
 

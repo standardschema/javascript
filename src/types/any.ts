@@ -1,26 +1,23 @@
 import assert = require('assert')
 import { identity, Context, TestFn, compose } from '../utils'
+import { Rule, RuleOptions } from './rule'
 
-export interface AnyOptions {
+export interface AnyOptions extends RuleOptions {
   required?: boolean
   default?: any
-  description?: string
-  meta?: any
-  uses?: Any[]
+  uses?: Rule[]
 }
 
-export class Any {
+export class Any extends Rule implements AnyOptions {
 
   type = 'Any'
   required = true
   default: any
-  description: string
-  meta: any = {}
-  uses: Any[] = []
-
-  _tests: Array<TestFn<any>> = []
+  uses: Rule[] = []
 
   constructor (options: AnyOptions = {}) {
+    super(options)
+
     if (options.default != null) {
       this.default = options.default
     }
@@ -29,14 +26,6 @@ export class Any {
       this.required = options.required
 
       assert.ok(typeof this.required === 'boolean', `Expected "required" to be a boolean`)
-    }
-
-    if (options.description != null) {
-      this.description = options.description
-    }
-
-    if (options.meta != null) {
-      this.meta = options.meta
     }
 
     if (options.uses != null) {
@@ -48,18 +37,8 @@ export class Any {
     this._tests.push(toUsesTest(this.uses))
   }
 
-  /**
-   * Structural type-check for serialisation/deserialisation.
-   */
   _isType (value: any) {
-    return true
-  }
-
-  /**
-   * Check whether a type is a sub-type of this type.
-   */
-  _typeOf (other: Any) {
-    return other instanceof this.constructor
+    return true // Any value assigns to `any`.
   }
 
 }
@@ -93,7 +72,7 @@ function toDefaultTest (defaulted: any) {
 /**
  * Execute on a list of types.
  */
-function toUsesTest (uses: Any[]): TestFn<any> {
+function toUsesTest (uses: Rule[]): TestFn<any> {
   if (uses.length === 0) {
     return identity
   }

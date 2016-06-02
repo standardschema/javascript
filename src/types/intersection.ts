@@ -1,16 +1,16 @@
 import extend = require('xtend')
-import { Any, AnyOptions } from './any'
+import { Rule, RuleOptions } from './rule'
 import { promiseEvery } from '../support/promises'
 import { skipEmpty, Context, compose } from '../utils'
 
-export interface IntersectionOptions extends AnyOptions {
-  types: Any[]
+export interface IntersectionOptions extends RuleOptions {
+  types: Rule[]
 }
 
-export class Intersection extends Any {
+export class Intersection extends Rule implements IntersectionOptions {
 
   type = 'Intersection'
-  types: Any[]
+  types: Rule[]
 
   constructor (options: IntersectionOptions) {
     super(options)
@@ -33,7 +33,7 @@ export class Intersection extends Any {
  *
  * TODO: Make this merge types in the intersection, instead of values.
  */
-function toItemsValidation (types: Any[]) {
+function toItemsValidation (types: Rule[]) {
   const tests = types.map(type => compose(type._tests))
 
   return function <T> (value: T, path: string[], context: Context) {

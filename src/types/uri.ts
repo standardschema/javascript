@@ -4,7 +4,7 @@ import { skipEmpty, Context } from '../utils'
 
 export interface UriOptions extends StringOptions {}
 
-export class Uri extends String {
+export class Uri extends String implements UriOptions {
 
   type = 'Uri'
 

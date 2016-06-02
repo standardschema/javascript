@@ -4,7 +4,7 @@ import { skipEmpty, Context } from '../utils'
 
 export interface EmailOptions extends StringOptions {}
 
-export class Email extends String {
+export class Email extends String implements EmailOptions {
 
   type = 'Email'
 

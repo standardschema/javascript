@@ -6,7 +6,7 @@ export interface NumberOptions extends AnyOptions {
   max?: number
 }
 
-export class Number extends Any {
+export class Number extends Any implements NumberOptions {
 
   type = 'Number'
   min: number

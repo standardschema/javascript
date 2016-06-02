@@ -1,3 +1,4 @@
+import { Rule } from './rule'
 import { Any, AnyOptions } from './any'
 import { promiseEvery } from '../support/promises'
 import { skipEmpty, Context, compose, ComposeFn } from '../utils'
@@ -8,12 +9,12 @@ export interface ObjectOptions extends AnyOptions {
 }
 
 export interface ObjectProperties {
-  [key: string]: Any
+  [key: string]: Rule
 }
 
-export type ObjectPropertyTypes = Array<[Any, Any]>
+export type ObjectPropertyTypes = Array<[Rule, Rule]>
 
-export class Object extends Any {
+export class Object extends Any implements ObjectOptions {
 
   type = 'Object'
   properties: ObjectProperties = {}
@@ -76,7 +77,7 @@ function isObject (value: any, path: string[], context: Context) {
  * Test all properties in an object definition.
  */
 function toPropertiesTest (properties: ObjectProperties, propertyTypes: ObjectPropertyTypes) {
-  const propertyTypeTests = propertyTypes.map<[Any, ComposeFn<any>, ComposeFn<any>]>(function (pair) {
+  const propertyTypeTests = propertyTypes.map<[Rule, ComposeFn<any>, ComposeFn<any>]>(function (pair) {
     const [keyType, valueType] = pair
 
     return [keyType, compose(keyType._tests), compose(valueType._tests)]

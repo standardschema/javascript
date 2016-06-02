@@ -1,16 +1,17 @@
 import assert = require('assert')
+import { Rule } from './rule'
 import { Any, AnyOptions } from './any'
 import { promiseEvery } from '../support/promises'
 import { skipEmpty, Context, compose } from '../utils'
 
 export interface TupleOptions extends AnyOptions {
-  tuple: Any[]
+  tuple: Rule[]
 }
 
-export class Tuple extends Any {
+export class Tuple extends Any implements TupleOptions {
 
   type = 'Tuple'
-  tuple: Any[]
+  tuple: Rule[]
 
   constructor (options: TupleOptions) {
     super(options)
@@ -28,7 +29,7 @@ export class Tuple extends Any {
 
 }
 
-function toTupleTest (tuple: Any[]) {
+function toTupleTest (tuple: Rule[]) {
   const tests = tuple.map(type => compose(type._tests))
 
   return function <T> (values: T[], path: string[], context: Context) {

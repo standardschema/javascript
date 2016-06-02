@@ -1,5 +1,5 @@
 import Promise = require('any-promise')
-import { Any } from './types/any'
+import { Rule } from './types/rule'
 
 const _hasOwnProperty = Object.prototype.hasOwnProperty
 
@@ -55,7 +55,7 @@ export function normalizePath (path: string[]) {
 export interface Context {
   root: any
   error: (path: string[], keyword: string, assertion: any, value: any) => void
-  rootSchema: Any
+  rootSchema: Rule
 }
 
 /**

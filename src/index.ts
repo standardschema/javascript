@@ -13,7 +13,7 @@ export { Types, Formats, Parsers, Utils }
 /**
  * Convert a schema to a validation function.
  */
-export function compile (rootSchema: Types.Any) {
+export function compile (rootSchema: Types.Rule) {
   const test = Utils.compose(rootSchema._tests)
 
   return function <T> (root: T): Promise<T> {

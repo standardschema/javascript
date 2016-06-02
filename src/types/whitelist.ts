@@ -1,11 +1,11 @@
-import { Any, AnyOptions } from './any'
+import { Rule, RuleOptions } from './rule'
 import { skipEmpty, Context } from '../utils'
 
-export interface WhitelistOptions extends AnyOptions {
+export interface WhitelistOptions extends RuleOptions {
   whitelist: any[]
 }
 
-export class Whitelist extends Any {
+export class Whitelist extends Rule implements WhitelistOptions {
 
   type = 'Whitelist'
   whitelist: any[]
@@ -26,10 +26,13 @@ export class Whitelist extends Any {
 
 }
 
-function toWhitelistTest (accept: any[]) {
+/**
+ * Reject any values missing from the whitelist.
+ */
+function toWhitelistTest (whitelist: any[]) {
   return function (value: any, path: string[], context: Context) {
-    if (accept.indexOf(value) === -1) {
-      throw context.error(path, 'whitelist', accept, value)
+    if (whitelist.indexOf(value) === -1) {
+      throw context.error(path, 'whitelist', whitelist, value)
     }
 
     return value

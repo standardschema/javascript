@@ -1,6 +1,6 @@
 import Promise = require('any-promise')
 
-import { Any } from '../types/any'
+import { Rule } from '../types/rule'
 import { MultiError } from './error'
 
 /**
@@ -10,7 +10,7 @@ export function promiseEvery <T> (fns: Array<() => Promise<T>>): Promise<T[]> {
   return new Promise((resolve, reject) => {
     let len = fns.length
     const errors: Error[] = []
-    const results: Any[] = new Array(len)
+    const results: Rule[] = new Array(len)
 
     // Exit with empty length.
     if (len === 0) {

@@ -1,11 +1,11 @@
-import { Any, AnyOptions } from './any'
+import { Rule, RuleOptions } from './rule'
 import { skipEmpty, Context } from '../utils'
 
-export interface BlacklistOptions extends AnyOptions {
+export interface BlacklistOptions extends RuleOptions {
   blacklist: any[]
 }
 
-export class Blacklist extends Any {
+export class Blacklist extends Rule implements BlacklistOptions {
 
   type = 'Blacklist'
   blacklist: any[]
@@ -26,10 +26,13 @@ export class Blacklist extends Any {
 
 }
 
-function toBlacklistTest (reject: any[]) {
+/**
+ * Check if the value matches anything in the blacklist.
+ */
+function toBlacklistTest (blacklist: any[]) {
   return function (value: any, path: string[], context: Context) {
-    if (reject.indexOf(value) > -1) {
-      throw context.error(path, 'blacklist', reject, value)
+    if (blacklist.indexOf(value) > -1) {
+      throw context.error(path, 'blacklist', blacklist, value)
     }
 
     return value

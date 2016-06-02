@@ -6,7 +6,7 @@ export interface UuidOptions extends StringOptions {
   version?: number
 }
 
-export class Uuid extends String {
+export class Uuid extends String implements UuidOptions {
 
   type = 'Uuid'
   version: number
