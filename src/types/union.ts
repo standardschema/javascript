@@ -1,12 +1,13 @@
+import { Any, AnyOptions } from './any'
 import { Rule } from './rule'
-import { promiseAny } from '../support/promises'
+import { promiseUnion } from '../support/promises'
 import { identity, TestFn } from '../utils'
 
-export interface UnionOptions {
+export interface UnionOptions extends AnyOptions {
   types: Rule[]
 }
 
-export class Union extends Rule implements UnionOptions {
+export class Union extends Any implements UnionOptions {
 
   type = 'Union'
   types: Rule[]
@@ -34,8 +35,10 @@ function toItemsTest (types: Rule[]): TestFn<any> {
   const tests = types.map(type => type._compile())
 
   return function (value, path, context, next) {
-    return promiseAny(tests.map((test) => {
-      return () => test(value, path, context, identity)
+    return promiseUnion(tests.map((test, index) => {
+      return function () {
+        return test(value, path, context, identity)
+      }
     })).then(res => next(res))
   }
 }

@@ -1,13 +1,14 @@
 import extend = require('xtend')
-import { Rule, RuleOptions } from './rule'
+import { Any, AnyOptions } from './any'
+import { Rule } from './rule'
 import { promiseEvery } from '../support/promises'
 import { TestFn, identity } from '../utils'
 
-export interface IntersectionOptions extends RuleOptions {
+export interface IntersectionOptions extends AnyOptions {
   types: Rule[]
 }
 
-export class Intersection extends Rule implements IntersectionOptions {
+export class Intersection extends Any implements IntersectionOptions {
 
   type = 'Intersection'
   types: Rule[]

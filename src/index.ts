@@ -32,6 +32,11 @@ export function compile (rootSchema: Types.Rule) {
 
     return test(root, [], context, Utils.identity)
       .catch((error) => {
+        // Error on non-`ValidationError` instances.
+        if (!(error instanceof ValidationError)) {
+          return Promise.reject(error)
+        }
+
         return Promise.reject(errors.length ? new MultiError(errors) : error)
       })
   }
