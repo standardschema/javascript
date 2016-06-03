@@ -1,5 +1,5 @@
 import assert = require('assert')
-import { identity, Context, TestFn, compose } from '../utils'
+import { TestFn, CompiledFn, compose, toNext } from '../utils'
 import { Rule, RuleOptions } from './rule'
 
 export interface AnyOptions extends RuleOptions {
@@ -34,11 +34,20 @@ export class Any extends Rule implements AnyOptions {
 
     this._tests.push(toDefaultTest(this.default))
     this._tests.push(toRequiredTest(this.required))
-    this._tests.push(toUsesTest(this.uses))
   }
 
   _isType (value: any) {
     return true // Any value assigns to `any`.
+  }
+
+  /**
+   * Compile types, making sure `uses` is always executed last.
+   */
+  _compile (): CompiledFn<any> {
+    return compose([
+      super._compile(),
+      compose(this.uses.map(type => type._compile()))
+    ])
   }
 
 }
@@ -46,36 +55,36 @@ export class Any extends Rule implements AnyOptions {
 /**
  * Generate a "required" function.
  */
-function toRequiredTest (required: boolean) {
+function toRequiredTest (required: boolean): TestFn<any> {
   if (!required) {
-    return identity
+    return function (value, path, context, next) {
+      // Skip the rest of validation for empty values.
+      if (value == null) {
+        return value
+      }
+
+      return next(value)
+    }
   }
 
-  return function <T> (value: T, path: string[], context: Context): T {
+  return function (value, path, context, next) {
     if (value == null) {
-      throw context.error(path, 'required', required, value)
+      throw context.error(path, 'Any', 'required', required, value)
     }
 
-    return value
+    return next(value)
   }
 }
 
 /**
- * Populate a default value when nothing set.
+ * Set the default value during validation.
  */
-function toDefaultTest (defaulted: any) {
-  return function (value: any) {
-    return value == null ? defaulted : value
-  }
-}
-
-/**
- * Execute on a list of types.
- */
-function toUsesTest (uses: Rule[]): TestFn<any> {
-  if (uses.length === 0) {
-    return identity
+function toDefaultTest (defaulted: any): TestFn<any> {
+  if (defaulted == null) {
+    return toNext
   }
 
-  return compose(uses.map(type => compose(type._tests)))
+  return function (value, path, context, next) {
+    return next(value == null ? defaulted : value)
+  }
 }

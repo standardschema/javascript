@@ -1,6 +1,6 @@
 import validator = require('validator')
 import { String, StringOptions } from './string'
-import { skipEmpty, Context } from '../utils'
+import { TestFn } from '../utils'
 
 export interface UuidOptions extends StringOptions {
   version?: number
@@ -18,7 +18,7 @@ export class Uuid extends String implements UuidOptions {
       this.version = options.version
     }
 
-    this._tests.push(skipEmpty(toUuidTest(this.version)))
+    this._tests.push(toUuidTest(this.version))
   }
 
   _isType (value: any) {
@@ -27,12 +27,12 @@ export class Uuid extends String implements UuidOptions {
 
 }
 
-function toUuidTest (version?: number) {
-  return function (value: string, path: string[], context: Context) {
+function toUuidTest (version?: number): TestFn<string> {
+  return function (value, path, context, next) {
     if (!validator.isUUID(value, version)) {
-      throw context.error(path, 'type', 'Uuid', value)
+      throw context.error(path, 'Uuid', 'type', 'Uuid', value)
     }
 
-    return value
+    return next(value)
   }
 }

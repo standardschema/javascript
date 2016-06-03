@@ -1,5 +1,5 @@
 import { Any, AnyOptions } from './any'
-import { skipEmpty, Context } from '../utils'
+import { Context, NextFunction } from '../utils'
 
 const _toString = Object.prototype.toString
 
@@ -14,7 +14,7 @@ export class Date extends Any implements DateOptions {
   constructor (options: DateOptions = {}) {
     super(options)
 
-    this._tests.push(skipEmpty(isDate))
+    this._tests.push(isDate)
   }
 
   _isType (value: any) {
@@ -23,14 +23,14 @@ export class Date extends Any implements DateOptions {
 
 }
 
-function isDate (value: any, path: string[], context: Context): Date {
+function isDate (value: any, path: string[], context: Context, next: NextFunction<any>) {
   if (_toString.call(value) !== '[object Date]') {
-    throw context.error(path, 'type', 'Date', value)
+    throw context.error(path, 'Date', 'type', 'Date', value)
   }
 
   if (isNaN(value.getTime())) {
-    throw context.error(path, 'type', 'Date', value)
+    throw context.error(path, 'Date', 'type', 'Date', value)
   }
 
-  return value
+  return next(value)
 }

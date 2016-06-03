@@ -14,15 +14,15 @@ export { Types, Formats, Parsers, Utils }
  * Convert a schema to a validation function.
  */
 export function compile (rootSchema: Types.Rule) {
-  const test = Utils.compose(rootSchema._tests)
+  const test = rootSchema._compile()
 
   return function <T> (root: T): Promise<T> {
     // Create a validation context.
     const errors: Error[] = []
     const context: Utils.Context = { root, rootSchema, error }
 
-    function error (path: string[], keyword: string, assertion: any, value: any) {
-      const err = new ValidationError(path, keyword, assertion, value)
+    function error (path: string[], type: string, keyword: string, assertion: any, value: any) {
+      const err = new ValidationError(path, type, keyword, assertion, value)
 
       // Collect errors during traversal.
       errors.push(err)
@@ -30,7 +30,7 @@ export function compile (rootSchema: Types.Rule) {
       return err
     }
 
-    return test(root, [], context)
+    return test(root, [], context, Utils.identity)
       .catch((error) => {
         return Promise.reject(errors.length ? new MultiError(errors) : error)
       })

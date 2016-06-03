@@ -1,7 +1,7 @@
 import assert = require('assert')
 import { Rule } from './rule'
 import { Any, AnyOptions } from './any'
-import { skipEmpty, Context, compose } from '../utils'
+import { Context, TestFn, NextFunction } from '../utils'
 import { promiseEvery } from '../support/promises'
 
 export interface ArrayOptions extends AnyOptions {
@@ -20,8 +20,8 @@ export class Array extends Any implements ArrayOptions {
 
     this.items = options.items
 
-    this._tests.push(skipEmpty(isArray))
-    this._tests.push(skipEmpty(toItemTest(this.items)))
+    this._tests.push(isArray)
+    this._tests.push(toItemTest(this.items))
   }
 
   _isType (value: any) {
@@ -30,20 +30,24 @@ export class Array extends Any implements ArrayOptions {
 
 }
 
-function isArray <T> (value: T[], path: string[], context: Context): T[] {
+function isArray (value: any, path: string[], context: Context, next: NextFunction<any>) {
   if (!global.Array.isArray(value)) {
-    throw context.error(path, 'type', 'Array', value)
+    throw context.error(path, 'Array', 'type', 'Array', value)
   }
 
-  return value
+  return next(value)
 }
 
-function toItemTest (schema: Rule) {
-  const test = compose(schema._tests)
+function toItemTest (schema: Rule): TestFn<any> {
+  const test = schema._compile()
 
-  return function <T> (value: T[], path: string[], context: Context) {
-    return promiseEvery<T>(value.map((value: T, index: number) => {
-      return () => test(value, path.concat(String(index)), context)
-    }))
+  return function (value, path, context, next) {
+    return promiseEvery(value.map((value: any, index: number) => {
+      const next = () => value
+
+      return function () {
+        return test(value, path.concat(String(index)), context, next)
+      }
+    })).then(() => next(value))
   }
 }

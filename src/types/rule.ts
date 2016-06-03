@@ -1,4 +1,4 @@
-import { TestFn } from '../utils'
+import { TestFn, CompiledFn, compose } from '../utils'
 
 export interface RuleOptions {
   description?: string
@@ -35,6 +35,13 @@ export class Rule implements RuleOptions {
    */
   _typeOf (other: Rule) {
     return other instanceof this.constructor
+  }
+
+  /**
+   * Compile the tests into a promise chain.
+   */
+  _compile (): CompiledFn<any> {
+    return compose(this._tests)
   }
 
 }

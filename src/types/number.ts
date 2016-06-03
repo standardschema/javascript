@@ -1,5 +1,5 @@
 import { Any, AnyOptions } from './any'
-import { skipEmpty, identity, TestFn, Context } from '../utils'
+import { toNext, TestFn, Context, NextFunction } from '../utils'
 
 export interface NumberOptions extends AnyOptions {
   min?: number
@@ -23,9 +23,9 @@ export class Number extends Any implements NumberOptions {
       this.max = options.max
     }
 
-    this._tests.push(skipEmpty(isNumber))
-    this._tests.push(skipEmpty(toMinTest(this.min)))
-    this._tests.push(skipEmpty(toMaxTest(this.max)))
+    this._tests.push(isNumber)
+    this._tests.push(toMinTest(this.min))
+    this._tests.push(toMaxTest(this.max))
   }
 
   _isType (value: any) {
@@ -34,38 +34,38 @@ export class Number extends Any implements NumberOptions {
 
 }
 
-function isNumber <T> (value: T, path: string[], context: Context): T {
+function isNumber (value: any, path: string[], context: Context, next: NextFunction<any>) {
   if (typeof value !== 'number') {
-    throw context.error(path, 'type', 'Number', value)
+    throw context.error(path, 'Number', 'type', 'Number', value)
   }
 
-  return value
+  return next(value)
 }
 
 function toMinTest (min: number): TestFn<number> {
   if (min == null) {
-    return identity
+    return toNext
   }
 
-  return function (value: number, path: string[], context: Context) {
+  return function (value, path, context, next) {
     if (value < min) {
-      throw context.error(path, 'min', min, value)
+      throw context.error(path, 'Number', 'min', min, value)
     }
 
-    return value
+    return next(value)
   }
 }
 
 function toMaxTest (max: number): TestFn<number> {
   if (max == null) {
-    return identity
+    return toNext
   }
 
-  return function (value: number, path: string[], context: Context) {
+  return function (value, path, context, next) {
     if (value > max) {
-      throw context.error(path, 'max', max, value)
+      throw context.error(path, 'Number', 'max', max, value)
     }
 
-    return value
+    return next(value)
   }
 }

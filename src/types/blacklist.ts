@@ -1,5 +1,5 @@
 import { Rule, RuleOptions } from './rule'
-import { skipEmpty, Context } from '../utils'
+import { TestFn } from '../utils'
 
 export interface BlacklistOptions extends RuleOptions {
   blacklist: any[]
@@ -17,7 +17,7 @@ export class Blacklist extends Rule implements BlacklistOptions {
       this.blacklist = options.blacklist
     }
 
-    this._tests.push(skipEmpty(toBlacklistTest(this.blacklist)))
+    this._tests.push(toBlacklistTest(this.blacklist))
   }
 
   _isType (value: any) {
@@ -29,12 +29,12 @@ export class Blacklist extends Rule implements BlacklistOptions {
 /**
  * Check if the value matches anything in the blacklist.
  */
-function toBlacklistTest (blacklist: any[]) {
-  return function (value: any, path: string[], context: Context) {
+function toBlacklistTest (blacklist: any[]): TestFn<any> {
+  return function (value, path, context, next) {
     if (blacklist.indexOf(value) > -1) {
-      throw context.error(path, 'blacklist', blacklist, value)
+      throw context.error(path, 'Blacklist', 'blacklist', blacklist, value)
     }
 
-    return value
+    return next(value)
   }
 }

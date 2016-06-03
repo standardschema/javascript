@@ -7,7 +7,13 @@ const IS_VALID_IDENTIFIER = /^[A-Za-z_$][A-Za-z0-9_$]*$/
  */
 export class ValidationError extends makeError.BaseError {
 
-  constructor (public path: string[], public keyword: string, public assertion: any, public value: any) {
+  constructor (
+    public path: string[],
+    public type: string,
+    public keyword: string,
+    public assertion: any,
+    public value: any
+  ) {
     super(`Validation failed for "${keyword}" at "${format(path)}"`)
   }
 

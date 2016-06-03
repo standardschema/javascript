@@ -1,7 +1,7 @@
 import { Rule } from './rule'
 import { Any, AnyOptions } from './any'
 import { promiseEvery } from '../support/promises'
-import { skipEmpty, Context, compose, ComposeFn } from '../utils'
+import { TestFn, Context, CompiledFn, identity, NextFunction } from '../utils'
 
 export interface ObjectOptions extends AnyOptions {
   properties?: ObjectProperties
@@ -31,8 +31,8 @@ export class Object extends Any implements ObjectOptions {
       this.propertyTypes = options.propertyTypes
     }
 
-    this._tests.push(skipEmpty(isObject))
-    this._tests.push(skipEmpty(toPropertiesTest(this.properties, this.propertyTypes)))
+    this._tests.push(isObject)
+    this._tests.push(toPropertiesTest(this.properties, this.propertyTypes))
   }
 
   /**
@@ -65,34 +65,37 @@ export class Object extends Any implements ObjectOptions {
 /**
  * Validate the value is an object.
  */
-function isObject (value: any, path: string[], context: Context) {
+function isObject (value: any, path: string[], context: Context, next: NextFunction<any>) {
   if (typeof value !== 'object') {
-    throw context.error(path, 'type', 'Object', value)
+    throw context.error(path, 'Object', 'type', 'Object', value)
   }
 
-  return value
+  return next(value)
 }
 
 /**
  * Test all properties in an object definition.
  */
-function toPropertiesTest (properties: ObjectProperties, propertyTypes: ObjectPropertyTypes) {
-  const propertyTypeTests = propertyTypes.map<[Rule, ComposeFn<any>, ComposeFn<any>]>(function (pair) {
-    const [keyType, valueType] = pair
+function toPropertiesTest (properties: ObjectProperties, propertyTypes: ObjectPropertyTypes): TestFn<any> {
+  const propertyTypeTests = propertyTypes
+    .map<[Rule, CompiledFn<any>, CompiledFn<any>]>(function (pair) {
+      const [keyType, valueType] = pair
 
-    return [keyType, compose(keyType._tests), compose(valueType._tests)]
-  })
+      return [keyType, keyType._compile(), valueType._compile()]
+    })
 
-  const propertyTests = global.Object.keys(properties).map<[string, ComposeFn<any>]>(function (key) {
-    return [key, compose(properties[key]._tests)]
-  })
+  const propertyTests = global.Object.keys(properties)
+    .map<[string, CompiledFn<any>]>(function (key) {
+      return [key, properties[key]._compile()]
+    })
 
-  return function (object: any, path: string[], context: Context) {
+  return function (object, path, context, next) {
     const keys = global.Object.keys(object)
 
     const properties = propertyTests.map(function ([key, test]) {
       return function () {
-        return test(object[key], path.concat(key), context).then(value => [key, value])
+        return test(object[key], path.concat(key), context, identity)
+          .then(value => [key, value])
       }
     })
 
@@ -104,14 +107,16 @@ function toPropertiesTest (properties: ObjectProperties, propertyTypes: ObjectPr
           }
 
           return promiseEvery([
-            () => keyTest(key, path.concat(key), context),
-            () => valueTest(object[key], path.concat(key), context)
+            () => keyTest(key, path.concat(key), context, identity),
+            () => valueTest(object[key], path.concat(key), context, identity)
           ])
         }
       }
     })
 
-    return promiseEvery(types.concat(properties)).then(pairs)
+    return promiseEvery(types.concat(properties))
+      .then(pairs)
+      .then(res => next(res))
   }
 }
 

@@ -1,5 +1,5 @@
 import { Any, AnyOptions } from './any'
-import { skipEmpty, Context } from '../utils'
+import { Context, NextFunction } from '../utils'
 
 export interface BooleanOptions extends AnyOptions {
 
@@ -12,7 +12,7 @@ export class Boolean extends Any implements BooleanOptions {
   constructor (options: BooleanOptions = {}) {
     super(options)
 
-    this._tests.push(skipEmpty(isBoolean))
+    this._tests.push(isBoolean)
   }
 
   _isType (value: any) {
@@ -24,10 +24,10 @@ export class Boolean extends Any implements BooleanOptions {
 /**
  * Run a boolean value check.
  */
-function isBoolean <T> (value: T, path: string[], context: Context): T {
+function isBoolean (value: any, path: string[], context: Context, next: NextFunction<any>) {
   if (typeof value !== 'boolean') {
-    throw context.error(path, 'type', 'Boolean', value)
+    throw context.error(path, 'Boolean', 'type', 'Boolean', value)
   }
 
-  return value
+  return next(value)
 }

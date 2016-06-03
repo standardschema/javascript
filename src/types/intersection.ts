@@ -1,7 +1,7 @@
 import extend = require('xtend')
 import { Rule, RuleOptions } from './rule'
 import { promiseEvery } from '../support/promises'
-import { skipEmpty, Context, compose } from '../utils'
+import { TestFn, identity } from '../utils'
 
 export interface IntersectionOptions extends RuleOptions {
   types: Rule[]
@@ -17,7 +17,7 @@ export class Intersection extends Rule implements IntersectionOptions {
 
     this.types = options.types
 
-    this._tests.push(skipEmpty(toItemsValidation(this.types)))
+    this._tests.push(toIntersectionTest(this.types))
   }
 
   _isType (value: any) {
@@ -33,15 +33,17 @@ export class Intersection extends Rule implements IntersectionOptions {
  *
  * TODO: Make this merge types in the intersection, instead of values.
  */
-function toItemsValidation (types: Rule[]) {
-  const tests = types.map(type => compose(type._tests))
+function toIntersectionTest (types: Rule[]): TestFn<any> {
+  const tests = types.map(type => type._compile())
 
-  return function <T> (value: T, path: string[], context: Context) {
+  return function (value, path, context, next) {
     const result = promiseEvery(tests.map((test) => {
-      return () => test(value, path, context)
+      return function () {
+        return test(value, path, context, identity)
+      }
     }))
 
-    return result.then(merge)
+    return result.then(merge).then(res => next(res))
   }
 }
 

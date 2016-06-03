@@ -1,5 +1,5 @@
 import { Any, AnyOptions } from './any'
-import { skipEmpty, identity, TestFn, Context } from '../utils'
+import { toNext, TestFn, Context, NextFunction } from '../utils'
 
 export interface StringOptions extends AnyOptions {
   minLength?: number
@@ -29,10 +29,10 @@ export class String extends Any implements StringOptions {
       this.pattern = options.pattern
     }
 
-    this._tests.push(skipEmpty(isString))
-    this._tests.push(skipEmpty(toPatternTest(this.pattern)))
-    this._tests.push(skipEmpty(toMinLengthTest(this.minLength)))
-    this._tests.push(skipEmpty(toMaxLengthTest(this.maxLength)))
+    this._tests.push(isString)
+    this._tests.push(toPatternTest(this.pattern))
+    this._tests.push(toMinLengthTest(this.minLength))
+    this._tests.push(toMaxLengthTest(this.maxLength))
   }
 
   _isType (value: any) {
@@ -41,54 +41,54 @@ export class String extends Any implements StringOptions {
 
 }
 
-function isString <T> (value: T, path: string[], context: Context): T {
+function isString <T> (value: T, path: string[], context: Context, next: NextFunction<T>) {
   if (typeof value !== 'string') {
-    throw context.error(path, 'type', 'String', value)
+    throw context.error(path, 'String', 'type', 'String', value)
   }
 
-  return value
+  return next(value)
 }
 
 function toMinLengthTest (minLength: number | void): TestFn<string> {
   if (minLength == null) {
-    return identity
+    return toNext
   }
 
-  return function (value: string, path: string[], context: Context) {
+  return function (value, path, context, next) {
     if (Buffer.byteLength(value) < minLength) {
-      throw context.error(path, 'minLength', minLength, value)
+      throw context.error(path, 'String', 'minLength', minLength, value)
     }
 
-    return value
+    return next(value)
   }
 }
 
 function toMaxLengthTest (maxLength: number | void): TestFn<string> {
   if (maxLength == null) {
-    return identity
+    return toNext
   }
 
-  return function (value: string, path: string[], context: Context) {
+  return function (value, path, context, next) {
     if (Buffer.byteLength(value) > maxLength) {
-      throw context.error(path, 'maxLength', maxLength, value)
+      throw context.error(path, 'String', 'maxLength', maxLength, value)
     }
 
-    return value
+    return next(value)
   }
 }
 
 function toPatternTest (pattern: string): TestFn<string> {
   if (pattern == null) {
-    return identity
+    return toNext
   }
 
   const re = new RegExp(pattern)
 
-  return function (value: string, path: string[], context: Context) {
+  return function (value, path, context, next) {
     if (!re.test(value)) {
-      throw context.error(path, 'pattern', pattern, value)
+      throw context.error(path, 'String', 'pattern', pattern, value)
     }
 
-    return value
+    return next(value)
   }
 }

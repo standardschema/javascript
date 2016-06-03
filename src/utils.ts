@@ -1,4 +1,5 @@
 import Promise = require('any-promise')
+import { ValidationError } from './support/error'
 import { Rule } from './types/rule'
 
 const _hasOwnProperty = Object.prototype.hasOwnProperty
@@ -6,11 +7,10 @@ const _hasOwnProperty = Object.prototype.hasOwnProperty
 /**
  * Retrieve a value by path.
  */
-export function getPath (value: any, path: string[]) {
-  const normalized = normalizePath(path)
+export function getValue (value: any, path: string[]) {
   let result = value
 
-  for (const key of normalized) {
+  for (const key of path) {
     if (!_hasOwnProperty.call(result, key)) {
       return
     }
@@ -25,28 +25,7 @@ export function getPath (value: any, path: string[]) {
  * Make a path relative to another.
  */
 export function relativePath (a: string[], b: string[]) {
-  return normalizePath([...a, '..', ...b])
-}
-
-/**
- * Normalize a path string.
- */
-export function normalizePath (path: string[]) {
-  const result: string[] = []
-
-  for (const key of path) {
-    if (key.charAt(0) === '.') {
-      if (key === '..') {
-        result.pop()
-      }
-
-      continue
-    }
-
-    result.push(key)
-  }
-
-  return result
+  return [...a.slice(0, -1), ...b]
 }
 
 /**
@@ -54,56 +33,66 @@ export function normalizePath (path: string[]) {
  */
 export interface Context {
   root: any
-  error: (path: string[], keyword: string, assertion: any, value: any) => void
+  error: (path: string[], type: string, keyword: string, assertion: any, value: any) => ValidationError
   rootSchema: Rule
 }
 
 /**
- * Noop. Return the input value.
+ * Identity.
  */
-export function identity <T> (value: T) {
+export function identity <T> (value: T): T {
   return value
 }
 
 /**
- * Test function.
+ * Proceed to `next(value)`.
+ */
+export function toNext <T> (value: T, path: string[], context: Context, next: (value: T) => T) {
+  return next(value)
+}
+
+/**
+ * Validation `next()` function.
+ */
+export type NextFunction <T> = (value: T) => Promise<T>
+
+/**
+ * Test function signature using `throwback`.
  */
 export interface TestFn <T> {
-  (value: T, path?: string[], context?: Context): T | Promise<T>
+  (value: T, path: string[], context: Context, next: NextFunction<T>): T | Promise<T>
 }
 
 /**
  * Interface for the composed function.
  */
-export interface ComposeFn <T> {
-  (value: T, path: string[], context: Context): Promise<T>
+export interface CompiledFn <T> {
+  (value: T, path: string[], context: Context, next: (value: T) => T): Promise<T>
 }
 
 /**
- * Wrap a function to skip empty input values.
+ * Compose functions into a validation chain.
  */
-export function skipEmpty <T> (test: TestFn<T>): TestFn<T> {
-  return function (value: T, path: string[], context: Context) {
-    if (value == null) {
-      return value
-    }
+export function compose (tests: Array<TestFn<any>>): CompiledFn<any> {
+  return function (value, path, context, done) {
+    let index = -1
 
-    return test(value, path, context)
-  }
-}
+    function dispatch (pos: number, value: any): Promise<any> {
+      if (pos <= index) {
+        throw new TypeError('`next()` called multiple times')
+      }
 
-/**
- * Compose an array of test functions together.
- */
-export function compose (tests: Array<TestFn<any>>): ComposeFn<any> {
-  return function <T> (value: T, path: string[], context: Context): Promise<T> {
-    // Run each test in order.
-    function reducer <T> (result: Promise<T>, test: TestFn<T>): Promise<T> {
-      return result.then(function (value: T) {
-        return test(value, path, context)
+      index = pos
+
+      const fn = tests[pos] || done
+
+      return new Promise(resolve => {
+        return resolve(fn(value, path, context, function next (value: any) {
+          return dispatch(pos + 1, value)
+        }))
       })
     }
 
-    return tests.reduce<Promise<T>>(reducer, Promise.resolve(value))
+    return dispatch(0, value)
   }
 }

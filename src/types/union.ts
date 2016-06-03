@@ -1,6 +1,6 @@
 import { Rule } from './rule'
 import { promiseAny } from '../support/promises'
-import { skipEmpty, Context, compose } from '../utils'
+import { compose, identity, TestFn } from '../utils'
 
 export interface UnionOptions {
   types: Rule[]
@@ -16,7 +16,7 @@ export class Union extends Rule implements UnionOptions {
 
     this.types = options.types
 
-    this._tests.push(skipEmpty(toItemsTest(this.types)))
+    this._tests.push(toItemsTest(this.types))
   }
 
   _isType (value: any) {
@@ -30,12 +30,12 @@ export class Union extends Rule implements UnionOptions {
 /**
  * Find one item that passes the tests.
  */
-function toItemsTest (types: Rule[]) {
+function toItemsTest (types: Rule[]): TestFn<any> {
   const tests = types.map(type => compose(type._tests))
 
-  return function <T> (value: T, path: string[], context: Context) {
+  return function (value, path, context, next) {
     return promiseAny(tests.map((test) => {
-      return () => test(value, path, context)
-    }))
+      return () => test(value, path, context, identity)
+    })).then(res => next(res))
   }
 }

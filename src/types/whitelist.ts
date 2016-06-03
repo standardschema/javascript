@@ -1,5 +1,5 @@
 import { Rule, RuleOptions } from './rule'
-import { skipEmpty, Context } from '../utils'
+import { TestFn } from '../utils'
 
 export interface WhitelistOptions extends RuleOptions {
   whitelist: any[]
@@ -17,7 +17,7 @@ export class Whitelist extends Rule implements WhitelistOptions {
       this.whitelist = options.whitelist
     }
 
-    this._tests.push(skipEmpty(toWhitelistTest(this.whitelist)))
+    this._tests.push(toWhitelistTest(this.whitelist))
   }
 
   _isType (value: any) {
@@ -29,12 +29,12 @@ export class Whitelist extends Rule implements WhitelistOptions {
 /**
  * Reject any values missing from the whitelist.
  */
-function toWhitelistTest (whitelist: any[]) {
-  return function (value: any, path: string[], context: Context) {
+function toWhitelistTest (whitelist: any[]): TestFn<any> {
+  return function (value, path, context, next) {
     if (whitelist.indexOf(value) === -1) {
-      throw context.error(path, 'whitelist', whitelist, value)
+      throw context.error(path, 'Whitelist', 'whitelist', whitelist, value)
     }
 
-    return value
+    return next(value)
   }
 }
