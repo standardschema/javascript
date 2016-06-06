@@ -1,7 +1,7 @@
 import test = require('blue-tape')
 import { Types, compile } from '../index'
 
-test('string', t => {
+test('mutate', t => {
   t.test('uses', t => {
     const schema = new Types.String({
       uses: [
