@@ -7,12 +7,10 @@ test('string', t => {
       uses: [
         new Types.Mutate({
           name: 'toLower',
-          mutate: (str: string) => str.toLowerCase(),
-          uses: [
-            new Types.Whitelist({
-              whitelist: ['hey']
-            })
-          ]
+          mutate: (str: string) => str.toLowerCase()
+        }),
+        new Types.Whitelist({
+          whitelist: ['hey']
         })
       ]
     })

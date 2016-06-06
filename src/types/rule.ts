@@ -3,6 +3,7 @@ import { TestFn, CompiledFn, compose } from '../utils'
 export interface RuleOptions {
   description?: string
   meta?: any
+  example?: any
 }
 
 export class Rule implements RuleOptions {
@@ -10,6 +11,7 @@ export class Rule implements RuleOptions {
   type = 'Any'
   description: string
   meta: any = {}
+  example: any
 
   _tests: Array<TestFn<any>> = []
 
@@ -20,6 +22,10 @@ export class Rule implements RuleOptions {
 
     if (options.meta != null) {
       this.meta = options.meta
+    }
+
+    if (options.example != null) {
+      this.example = options.example
     }
   }
 

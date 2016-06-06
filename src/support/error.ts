@@ -13,7 +13,7 @@ export class ValidationError extends makeError.BaseError {
     public assertion: any,
     public value: any
   ) {
-    super(`Validation failed for "${keyword}" at "${formatPath(path)}"`)
+    super(`Validation failed for "${type}" at "${formatPath(path)}"`)
   }
 
 }
