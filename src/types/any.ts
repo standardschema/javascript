@@ -1,10 +1,10 @@
 import assert = require('assert')
-import { TestFn, CompiledFn, compose, toNext } from '../utils'
+import { TestFn, CompiledFn, compose, toNext, Ref, toValue } from '../utils'
 import { Rule, RuleOptions } from './rule'
 
 export interface AnyOptions extends RuleOptions {
   required?: boolean
-  default?: any
+  default?: any | Ref
   uses?: Rule[]
 }
 
@@ -12,7 +12,7 @@ export class Any extends Rule implements AnyOptions {
 
   type = 'Any'
   required = true
-  default: any
+  default: any | Ref
   uses: Rule[] = []
 
   constructor (options: AnyOptions = {}) {
@@ -80,11 +80,13 @@ function toRequiredTest (required: boolean): TestFn<any> {
  * Set the default value during validation.
  */
 function toDefaultTest (defaulted: any): TestFn<any> {
+  const defaultValue = toValue(defaulted)
+
   if (defaulted == null) {
     return toNext
   }
 
   return function (value, path, context, next) {
-    return next(value == null ? defaulted : value)
+    return next(value == null ? defaultValue(path, context) : value)
   }
 }

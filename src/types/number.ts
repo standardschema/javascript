@@ -1,16 +1,16 @@
 import { Any, AnyOptions } from './any'
-import { toNext, TestFn, Context, NextFunction } from '../utils'
+import { toNext, TestFn, Context, NextFunction, toValue, Ref } from '../utils'
 
 export interface NumberOptions extends AnyOptions {
-  min?: number
-  max?: number
+  min?: number | Ref
+  max?: number | Ref
 }
 
 export class Number extends Any implements NumberOptions {
 
   type = 'Number'
-  min: number
-  max: number
+  min: number | Ref
+  max: number | Ref
 
   constructor (options: NumberOptions = {}) {
     super(options)
@@ -35,19 +35,23 @@ export class Number extends Any implements NumberOptions {
 }
 
 function isNumber (value: any, path: string[], context: Context, next: NextFunction<any>) {
-  if (typeof value !== 'number') {
+  if (typeof value !== 'number' || !isFinite(value)) {
     throw context.error(path, 'Number', 'type', 'Number', value)
   }
 
   return next(value)
 }
 
-function toMinTest (min: number): TestFn<number> {
+function toMinTest (min: number | Ref): TestFn<number> {
+  const minValue = toValue(min)
+
   if (min == null) {
     return toNext
   }
 
   return function (value, path, context, next) {
+    const min = minValue(path, context)
+
     if (value < min) {
       throw context.error(path, 'Number', 'min', min, value)
     }
@@ -56,12 +60,16 @@ function toMinTest (min: number): TestFn<number> {
   }
 }
 
-function toMaxTest (max: number): TestFn<number> {
+function toMaxTest (max: number | Ref): TestFn<number> {
+  const maxValue = toValue(max)
+
   if (max == null) {
     return toNext
   }
 
   return function (value, path, context, next) {
+    const max = maxValue(path, context)
+
     if (value > max) {
       throw context.error(path, 'Number', 'max', max, value)
     }

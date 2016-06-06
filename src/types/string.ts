@@ -1,18 +1,18 @@
 import { Any, AnyOptions } from './any'
-import { toNext, TestFn, Context, NextFunction } from '../utils'
+import { toNext, TestFn, Context, NextFunction, Ref, toValue } from '../utils'
 
 export interface StringOptions extends AnyOptions {
-  minLength?: number
-  maxLength?: number
-  pattern?: string
+  minLength?: number | Ref
+  maxLength?: number | Ref
+  pattern?: string | Ref
 }
 
 export class String extends Any implements StringOptions {
 
   type = 'String'
-  minLength: number
-  maxLength: number
-  pattern: string
+  minLength: number | Ref
+  maxLength: number | Ref
+  pattern: string | Ref
 
   constructor (options: StringOptions = {}) {
     super(options)
@@ -49,12 +49,16 @@ function isString <T> (value: T, path: string[], context: Context, next: NextFun
   return next(value)
 }
 
-function toMinLengthTest (minLength: number | void): TestFn<string> {
+function toMinLengthTest (minLength: number | Ref | void): TestFn<string> {
+  const minLengthValue = toValue(minLength)
+
   if (minLength == null) {
     return toNext
   }
 
   return function (value, path, context, next) {
+    const minLength = minLengthValue(path, context)
+
     if (Buffer.byteLength(value) < minLength) {
       throw context.error(path, 'String', 'minLength', minLength, value)
     }
@@ -63,12 +67,16 @@ function toMinLengthTest (minLength: number | void): TestFn<string> {
   }
 }
 
-function toMaxLengthTest (maxLength: number | void): TestFn<string> {
+function toMaxLengthTest (maxLength: number | Ref | void): TestFn<string> {
+  const maxLengthValue = toValue(maxLength)
+
   if (maxLength == null) {
     return toNext
   }
 
   return function (value, path, context, next) {
+    const maxLength = maxLengthValue(path, context)
+
     if (Buffer.byteLength(value) > maxLength) {
       throw context.error(path, 'String', 'maxLength', maxLength, value)
     }
@@ -77,14 +85,16 @@ function toMaxLengthTest (maxLength: number | void): TestFn<string> {
   }
 }
 
-function toPatternTest (pattern: string): TestFn<string> {
+function toPatternTest (pattern: string | Ref): TestFn<string> {
   if (pattern == null) {
     return toNext
   }
 
-  const re = new RegExp(pattern)
+  const patternValue = toValue(pattern)
 
   return function (value, path, context, next) {
+    const re = new RegExp(patternValue(path, context))
+
     if (!re.test(value)) {
       throw context.error(path, 'String', 'pattern', pattern, value)
     }

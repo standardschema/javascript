@@ -1,6 +1,5 @@
 import makeError = require('make-error-cause')
-
-const IS_VALID_IDENTIFIER = /^[A-Za-z_$][A-Za-z0-9_$]*$/
+import { formatPath } from '../utils'
 
 /**
  * Create validation error instances.
@@ -14,7 +13,7 @@ export class ValidationError extends makeError.BaseError {
     public assertion: any,
     public value: any
   ) {
-    super(`Validation failed for "${keyword}" at "${format(path)}"`)
+    super(`Validation failed for "${keyword}" at "${formatPath(path)}"`)
   }
 
 }
@@ -28,21 +27,4 @@ export class MultiError extends makeError.BaseError {
     super(errors.map(err => err.message).join('; '))
   }
 
-}
-
-/**
- * Compile a path array to property path string.
- */
-function format (segments: string[]): string {
-  let result = ''
-
-  segments.forEach(function (segment, index) {
-    if (IS_VALID_IDENTIFIER.test(segment)) {
-      result += index === 0 ? segment : `.${segment}`
-    } else {
-      result += `['${segment.replace(/'/g, '\\\'')}']`
-    }
-  })
-
-  return result
 }

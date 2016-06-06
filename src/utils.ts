@@ -2,7 +2,50 @@ import Promise = require('any-promise')
 import { ValidationError } from './support/error'
 import { Rule } from './types/rule'
 
+const IS_VALID_IDENTIFIER = /^[A-Za-z_$][A-Za-z0-9_$]*$/
 const _hasOwnProperty = Object.prototype.hasOwnProperty
+
+/**
+ * Make a ref object. Easily serialisable, without any obscurity.
+ */
+export function ref ($ref: string[], $offset?: number) {
+  return { $ref, $offset }
+}
+
+/**
+ * Reference object.
+ */
+export interface Ref {
+  $ref: string[]
+  $offset?: number
+}
+
+/**
+ * Create a function to return a runtime value.
+ */
+export function toValue (value: void | string | number | boolean | Ref): (path: string[], context: any) => any {
+  if (value == null || typeof value !== 'object') {
+    return () => value
+  }
+
+  if (Array.isArray((value as Ref).$ref)) {
+    const ref = (value as Ref).$ref
+    const offset = (value as Ref).$offset
+
+    return function (path: string[], context: Context) {
+      const fullPath = relativePath(path, ref, offset)
+      const result = getValue(context.root, fullPath)
+
+      if (result == null || typeof value !== 'object') {
+        throw new TypeError(`Value reference must be a primitive value (${formatPath(fullPath)})`)
+      }
+
+      return result
+    }
+  }
+
+  throw new TypeError('Value argument must be a reference or primitive value')
+}
 
 /**
  * Retrieve a value by path.
@@ -24,8 +67,23 @@ export function getValue (value: any, path: string[]) {
 /**
  * Make a path relative to another.
  */
-export function relativePath (a: string[], b: string[]) {
-  return [...a.slice(0, -1), ...b]
+export function relativePath (ctx: string[], ref: string[], offset: number = 0) {
+  const out: string[] = []
+  const rel = ctx.length - offset
+
+  if (rel < 0) {
+    throw new TypeError(`Unable to resolve offset "${offset}" from depth "${ctx.length}"`)
+  }
+
+  for (let i = 0; i < rel; i++) {
+    out.push(ctx[i])
+  }
+
+  for (let i = 0; i < ref.length; i++) {
+    out.push(ref[i])
+  }
+
+  return out
 }
 
 /**
@@ -95,4 +153,21 @@ export function compose (tests: Array<TestFn<any>>): CompiledFn<any> {
 
     return dispatch(0, value)
   }
+}
+
+/**
+ * Compile a path array to property path string.
+ */
+export function formatPath (segments: string[]): string {
+  let result = ''
+
+  segments.forEach(function (segment, index) {
+    if (IS_VALID_IDENTIFIER.test(segment)) {
+      result += index === 0 ? segment : `.${segment}`
+    } else {
+      result += `['${segment.replace(/'/g, '\\\'')}']`
+    }
+  })
+
+  return result
 }

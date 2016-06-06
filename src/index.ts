@@ -18,7 +18,7 @@ export function compile (rootSchema: Types.Rule) {
 
   return function <T> (root: T): Promise<T> {
     // Create a validation context.
-    const errors: Error[] = []
+    const errors: ValidationError[] = []
     const context: Utils.Context = { root, rootSchema, error }
 
     function error (path: string[], type: string, keyword: string, assertion: any, value: any) {
