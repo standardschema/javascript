@@ -1,5 +1,5 @@
 import { Any, AnyOptions } from './any'
-import { toNext, TestFn, Context, NextFunction, Ref, toValue } from '../utils'
+import { toNext, TestFn, Context, NextFunction, Ref, toValue, wrapIsType } from '../utils'
 
 export interface StringOptions extends AnyOptions {
   minLength?: number | Ref
@@ -36,7 +36,9 @@ export class String extends Any implements StringOptions {
   }
 
   _isType (value: any) {
-    return typeof value === 'string'
+    return wrapIsType(this, value, super._isType, (value) => {
+      return typeof value === 'string'
+    })
   }
 
 }

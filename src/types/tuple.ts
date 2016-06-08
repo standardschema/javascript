@@ -2,7 +2,7 @@ import assert = require('assert')
 import { Rule } from './rule'
 import { Any, AnyOptions } from './any'
 import { promiseEvery } from '../support/promises'
-import { TestFn, identity } from '../utils'
+import { TestFn, identity, wrapIsType } from '../utils'
 
 export interface TupleOptions extends AnyOptions {
   tuple: Rule[]
@@ -24,7 +24,9 @@ export class Tuple extends Any implements TupleOptions {
   }
 
   _isType (value: any) {
-    return value.length === this.tuple.length
+    return wrapIsType(this, value, super._isType, (value) => {
+      return value.length === this.tuple.length
+    })
   }
 
 }

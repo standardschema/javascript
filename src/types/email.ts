@@ -1,6 +1,6 @@
 import validator = require('validator')
 import { String, StringOptions } from './string'
-import { Context, NextFunction } from '../utils'
+import { Context, NextFunction, wrapIsType } from '../utils'
 
 export interface EmailOptions extends StringOptions {}
 
@@ -12,6 +12,12 @@ export class Email extends String implements EmailOptions {
     super(options)
 
     this._tests.push(isEmail)
+  }
+
+  _isType (value: any) {
+    return wrapIsType(this, value, super._isType, (value) => {
+      return validator.isEmail(value)
+    })
   }
 
 }

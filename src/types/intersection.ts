@@ -2,7 +2,7 @@ import extend = require('xtend')
 import { Any, AnyOptions } from './any'
 import { Rule } from './rule'
 import { promiseEvery } from '../support/promises'
-import { TestFn, identity } from '../utils'
+import { TestFn, identity, wrapIsType } from '../utils'
 
 export interface IntersectionOptions extends AnyOptions {
   types: Rule[]
@@ -22,8 +22,10 @@ export class Intersection extends Any implements IntersectionOptions {
   }
 
   _isType (value: any) {
-    return this.types.every(function (type) {
-      return type._isType(value)
+    return wrapIsType(this, value, super._isType, (value) => {
+      return this.types.every(function (type) {
+        return type._isType(value)
+      })
     })
   }
 

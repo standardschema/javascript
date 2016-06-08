@@ -1,6 +1,6 @@
 import validator = require('validator')
 import { String, StringOptions } from './string'
-import { TestFn } from '../utils'
+import { TestFn, wrapIsType } from '../utils'
 
 export interface UuidOptions extends StringOptions {
   version?: number
@@ -22,7 +22,9 @@ export class Uuid extends String implements UuidOptions {
   }
 
   _isType (value: any) {
-    return validator.isUUID(value)
+    return wrapIsType(this, value, super._isType, (value) => {
+      return validator.isUUID(value)
+    })
   }
 
 }

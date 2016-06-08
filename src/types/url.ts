@@ -1,6 +1,6 @@
 import validator = require('validator')
 import { String, StringOptions } from './string'
-import { Context, NextFunction } from '../utils'
+import { Context, NextFunction, wrapIsType } from '../utils'
 
 export interface UrlOptions extends StringOptions {}
 
@@ -15,7 +15,9 @@ export class Url extends String implements UrlOptions {
   }
 
   _isType (value: any) {
-    return validator.isURL(value)
+    return wrapIsType(this, value, super._isType, (value) => {
+      return validator.isURL(value)
+    })
   }
 
 }

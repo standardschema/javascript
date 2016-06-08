@@ -1,5 +1,5 @@
 import { Any, AnyOptions } from './any'
-import { Context, NextFunction } from '../utils'
+import { Context, NextFunction, wrapIsType } from '../utils'
 
 const _toString = Object.prototype.toString
 
@@ -18,7 +18,9 @@ export class Date extends Any implements DateOptions {
   }
 
   _isType (value: any) {
-    return _toString.call(value) === '[object Date]'
+    return wrapIsType(this, value, super._isType, (value) => {
+      return _toString.call(value) === '[object Date]'
+    })
   }
 
 }

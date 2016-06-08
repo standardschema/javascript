@@ -125,7 +125,7 @@ export interface TestFn <T> {
  * Interface for the composed function.
  */
 export interface CompiledFn <T> {
-  (value: T, path: string[], context: Context, next: (value: T) => T): Promise<T>
+  (value: T, path: string[], context: Context, next: NextFunction<T>): Promise<T>
 }
 
 /**
@@ -170,4 +170,20 @@ export function formatPath (segments: string[]): string {
   })
 
   return result
+}
+
+/**
+ * Call `_isType` on parent, handling `null`.
+ */
+export function wrapIsType <T> (
+  context: any,
+  value: any,
+  _test: (value: any) => boolean,
+  test: (value: any) => boolean
+): boolean {
+  if (value == null) {
+    return _test.call(context, value)
+  }
+
+  return _test.call(context, value) && test.call(context, value)
 }

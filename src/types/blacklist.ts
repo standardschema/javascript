@@ -1,5 +1,5 @@
 import { Rule, RuleOptions } from './rule'
-import { TestFn } from '../utils'
+import { TestFn, wrapIsType } from '../utils'
 
 export interface BlacklistOptions extends RuleOptions {
   blacklist: any[]
@@ -21,7 +21,9 @@ export class Blacklist extends Rule implements BlacklistOptions {
   }
 
   _isType (value: any) {
-    return this.blacklist.indexOf(value) === -1
+    return wrapIsType(this, value, super._isType, (value) => {
+      return this.blacklist.indexOf(value) === -1
+    })
   }
 
 }

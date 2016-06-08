@@ -37,6 +37,10 @@ export class Any extends Rule implements AnyOptions {
   }
 
   _isType (value: any) {
+    if (this.required) {
+      return value != null
+    }
+
     return true // Any value assigns to `any`.
   }
 

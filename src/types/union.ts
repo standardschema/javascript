@@ -1,7 +1,7 @@
 import { Any, AnyOptions } from './any'
 import { Rule } from './rule'
 import { promiseUnion } from '../support/promises'
-import { identity, TestFn } from '../utils'
+import { identity, TestFn, wrapIsType } from '../utils'
 
 export interface UnionOptions extends AnyOptions {
   types: Rule[]
@@ -21,8 +21,10 @@ export class Union extends Any implements UnionOptions {
   }
 
   _isType (value: any) {
-    return this.types.some(function (type) {
-      return type._isType(value)
+    return wrapIsType(this, value, super._isType, (value) => {
+      return this.types.some(function (type) {
+        return type._isType(value)
+      })
     })
   }
 

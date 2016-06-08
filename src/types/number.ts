@@ -1,5 +1,5 @@
 import { Any, AnyOptions } from './any'
-import { toNext, TestFn, Context, NextFunction, toValue, Ref } from '../utils'
+import { toNext, TestFn, Context, NextFunction, toValue, Ref, wrapIsType } from '../utils'
 
 export interface NumberOptions extends AnyOptions {
   min?: number | Ref
@@ -29,7 +29,9 @@ export class Number extends Any implements NumberOptions {
   }
 
   _isType (value: any) {
-    return typeof value === 'number'
+    return wrapIsType(this, value, super._isType, (value) => {
+      return typeof value === 'number'
+    })
   }
 
 }

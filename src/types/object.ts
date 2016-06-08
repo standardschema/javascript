@@ -1,7 +1,8 @@
+import Promise = require('any-promise')
 import { Rule } from './rule'
 import { Any, AnyOptions } from './any'
 import { promiseEvery } from '../support/promises'
-import { TestFn, Context, CompiledFn, identity, NextFunction } from '../utils'
+import { TestFn, Context, CompiledFn, identity, NextFunction, wrapIsType } from '../utils'
 
 export interface ObjectOptions extends AnyOptions {
   properties?: ObjectProperties
@@ -39,25 +40,31 @@ export class Object extends Any implements ObjectOptions {
    * Check if an object matches the schema structure.
    */
   _isType (object: any) {
-    if (typeof object !== 'object') {
-      return false
-    }
-
-    const keys = global.Object.keys(object)
-
-    for (const key of keys) {
-      const value = object[key]
-
-      if (this.properties[key]) {
-        return this.properties[key]._isType(value)
+    return wrapIsType(this, object, super._isType, (object) => {
+      if (typeof object !== 'object') {
+        return false
       }
 
-      for (const [keyType, valueType] of this.propertyTypes) {
-        if (keyType._isType(key)) {
-          return valueType._isType(key)
+      for (const key of global.Object.keys(object)) {
+        const value = object[key]
+
+        if (this.properties[key]) {
+          if (!this.properties[key]._isType(value)) {
+            return false
+          }
+        }
+
+        for (const [keyType, valueType] of this.propertyTypes) {
+          if (keyType._isType(key)) {
+            if (!valueType._isType(key)) {
+              return false
+            }
+          }
         }
       }
-    }
+
+      return true
+    })
   }
 
 }
@@ -90,33 +97,43 @@ function toPropertiesTest (properties: ObjectProperties, propertyTypes: ObjectPr
     })
 
   return function (object, path, context, next) {
-    const keys = global.Object.keys(object)
+    const testMap: { [key: string]: Array<(path: string[], tuple: [string, any]) => Promise<[any, any]>> } = {}
 
-    const properties = propertyTests.map(function ([key, test]) {
-      return function () {
-        return test(object[key], path.concat(key), context, identity)
-          .then(value => [key, value])
-      }
-    })
+    for (const [key, test] of propertyTests) {
+      pushKey(testMap, key, function (path: string[], [key, value]: [string, any]) {
+        return test(value, path, context, identity).then(value => [key, value])
+      })
+    }
 
-    const types = propertyTypeTests.map(function ([keyType, keyTest, valueTest]) {
-      return function () {
-        for (const key of keys) {
-          if (!keyType._isType(key)) {
-            continue
-          }
-
-          return promiseEvery([
-            () => keyTest(key, path.concat(key), context, identity),
-            () => valueTest(object[key], path.concat(key), context, identity)
-          ])
+    for (const key of global.Object.keys(object)) {
+      for (const [keyType, keyTest, valueTest] of propertyTypeTests) {
+        if (keyType._isType(key)) {
+          pushKey(testMap, key, function (path: string[], [key, value]: [string, any]) {
+            return promiseEvery([
+              () => keyTest(key, path, context, identity),
+              () => valueTest(value, path, context, identity)
+            ])
+          })
         }
       }
+    }
+
+    const exec = global.Object.keys(testMap).map(function (key) {
+      const tests = testMap[key]
+      const value = object[key]
+      const testPath = path.concat(key)
+
+      return function () {
+        return tests.reduce<Promise<[string, any]>>(
+          function (res, test) {
+            return res.then(out => test(testPath, out))
+          },
+          Promise.resolve<[string, any]>([key, value])
+        )
+      }
     })
 
-    return promiseEvery(types.concat(properties))
-      .then(pairs)
-      .then(res => next(res))
+    return promiseEvery(exec).then(pairs).then(res => next(res))
   }
 }
 
@@ -133,4 +150,13 @@ function pairs (pairs: Array<[string, any]>) {
   }
 
   return result
+}
+
+/**
+ * Push key onto property.
+ */
+function pushKey <T> (obj: { [key: string]: T[] }, key: string, value: T) {
+  obj[key] = obj[key] || []
+  obj[key].push(value)
+  return obj
 }

@@ -38,10 +38,16 @@ test('object', t => {
 
     const validate = compile(schema)
 
+    t.test('is structural type', t => {
+      t.equal(schema._isType({ '123': 'abc' }), true)
+      t.end()
+    })
+
     t.test('accept valid property types', t => {
-      return validate({ '123': '123' })
+      return validate({ '123': '123', '456': '456' })
         .then(function (res) {
           t.equal(res[123], '123')
+          t.equal(res[456], '456')
         })
     })
 

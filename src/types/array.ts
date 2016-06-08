@@ -1,7 +1,7 @@
 import assert = require('assert')
 import { Rule } from './rule'
 import { Any, AnyOptions } from './any'
-import { Context, TestFn, NextFunction, Ref, toValue, toNext } from '../utils'
+import { Context, TestFn, NextFunction, Ref, toValue, toNext, wrapIsType } from '../utils'
 import { promiseEvery } from '../support/promises'
 
 export interface ArrayOptions extends AnyOptions {
@@ -39,7 +39,9 @@ export class Array extends Any implements ArrayOptions {
   }
 
   _isType (value: any) {
-    return global.Array.isArray(value)
+    return wrapIsType(this, value, super._isType, (value) => {
+      return global.Array.isArray(value)
+    })
   }
 
 }

@@ -1,5 +1,5 @@
 import { Any, AnyOptions } from './any'
-import { Context, NextFunction } from '../utils'
+import { Context, NextFunction, wrapIsType } from '../utils'
 
 export interface BooleanOptions extends AnyOptions {
 
@@ -16,7 +16,9 @@ export class Boolean extends Any implements BooleanOptions {
   }
 
   _isType (value: any) {
-    return typeof value === 'boolean'
+    return wrapIsType(this, value, super._isType, (value) => {
+      return typeof value === 'boolean'
+    })
   }
 
 }
