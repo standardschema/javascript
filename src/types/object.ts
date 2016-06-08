@@ -56,7 +56,7 @@ export class Object extends Any implements ObjectOptions {
 
         for (const [keyType, valueType] of this.propertyTypes) {
           if (keyType._isType(key)) {
-            if (!valueType._isType(key)) {
+            if (!valueType._isType(value)) {
               return false
             }
           }
