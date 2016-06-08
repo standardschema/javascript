@@ -39,7 +39,7 @@ test('object', t => {
     const validate = compile(schema)
 
     t.test('is structural type', t => {
-      t.equal(schema._isType({ '123': 'abc' }), true)
+      t.ok(schema._isType({ '123': 'abc' }))
       t.end()
     })
 
