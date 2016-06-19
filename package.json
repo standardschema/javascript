@@ -1,6 +1,6 @@
 {
   "name": "jaywalk",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "Runtime type validation",
   "main": "dist/index.js",
   "files": [
