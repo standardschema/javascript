@@ -16,7 +16,7 @@ export class Email extends String implements EmailOptions {
 
   _isType (value: any) {
     return wrapIsType(this, value, super._isType, (value) => {
-      return validator.isEmail(value)
+      return validator.isEmail(value) ? 1 : 0
     })
   }
 

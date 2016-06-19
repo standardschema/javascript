@@ -19,7 +19,7 @@ export class Date extends Any implements DateOptions {
 
   _isType (value: any) {
     return wrapIsType(this, value, super._isType, (value) => {
-      return _toString.call(value) === '[object Date]'
+      return _toString.call(value) === '[object Date]' ? 1 : 0
     })
   }
 

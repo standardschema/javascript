@@ -178,12 +178,20 @@ export function formatPath (segments: string[]): string {
 export function wrapIsType <T> (
   context: any,
   value: any,
-  _test: (value: any) => boolean,
-  test: (value: any) => boolean
-): boolean {
-  if (value == null) {
-    return _test.call(context, value)
+  _test: (value: any) => number,
+  test: (value: any) => number
+): number {
+  const result = _test.call(context, value)
+
+  if (value == null || value === 0) {
+    return result
   }
 
-  return _test.call(context, value) && test.call(context, value)
+  const check = test.call(context, value)
+
+  if (check === 0) {
+    return 0
+  }
+
+  return result + check
 }

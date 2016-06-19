@@ -20,8 +20,8 @@ export class Blacklist extends Rule implements BlacklistOptions {
     this._tests.push(toBlacklistTest(this.blacklist))
   }
 
-  _isType (value: any) {
-    return this.blacklist.indexOf(value) === -1
+  _isType (value: any): number {
+    return this.blacklist.indexOf(value) === -1 ? 1 : 0
   }
 
 }

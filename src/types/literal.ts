@@ -20,7 +20,7 @@ export class Literal extends Any implements LiteralOptions {
 
   _isType (value: any) {
     return wrapIsType(this, value, super._isType, (value) => {
-      return value === this.value
+      return value === this.value ? 1 : 0
     })
   }
 

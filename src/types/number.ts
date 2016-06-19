@@ -30,7 +30,7 @@ export class Number extends Any implements NumberOptions {
 
   _isType (value: any) {
     return wrapIsType(this, value, super._isType, (value) => {
-      return typeof value === 'number'
+      return typeof value === 'number' ? 1 : 0
     })
   }
 

@@ -17,9 +17,9 @@ test('literal', t => {
     })
 
     t.test('structural check', t => {
-      t.equal(schema._isType('test'), true)
-      t.equal(schema._isType('foo'), false)
-      t.equal(schema._isType(123), false)
+      t.equal(schema._isType('test'), 2)
+      t.equal(schema._isType('foo'), 0)
+      t.equal(schema._isType(123), 0)
       t.end()
     })
 

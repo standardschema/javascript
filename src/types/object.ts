@@ -41,29 +41,39 @@ export class Object extends Any implements ObjectOptions {
    */
   _isType (object: any) {
     return wrapIsType(this, object, super._isType, (object) => {
+      let res = 0
+
       if (typeof object !== 'object') {
-        return false
+        return 0
       }
 
       // Check type against all valid keys.
       for (const key of global.Object.keys(this.properties)) {
-        if (!this.properties[key]._isType(object[key])) {
-          return false
+        const check = this.properties[key]._isType(object[key])
+
+        if (check === 0) {
+          return 0
         }
+
+        res += 1
       }
 
       // Check the rest of keys against key/value types.
       for (const key of global.Object.keys(object)) {
         for (const [keyType, valueType] of this.propertyTypes) {
           if (keyType._isType(key)) {
-            if (!valueType._isType(object[key])) {
-              return false
+            const check = valueType._isType(object[key])
+
+            if (check === 0) {
+              return 0
             }
+
+            res += 1
           }
         }
       }
 
-      return true
+      return res
     })
   }
 

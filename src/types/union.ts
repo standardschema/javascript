@@ -1,7 +1,6 @@
 import { Any, AnyOptions } from './any'
 import { Rule } from './rule'
-import { promiseUnion } from '../support/promises'
-import { identity, TestFn, wrapIsType } from '../utils'
+import { TestFn, wrapIsType } from '../utils'
 
 export interface UnionOptions extends AnyOptions {
   types: Rule[]
@@ -22,9 +21,17 @@ export class Union extends Any implements UnionOptions {
 
   _isType (value: any) {
     return wrapIsType(this, value, super._isType, (value) => {
-      return this.types.some(function (type) {
-        return type._isType(value)
-      })
+      let res = 0
+
+      for (const type of this.types) {
+        const check = type._isType(value)
+
+        if (check > res) {
+          res = check
+        }
+      }
+
+      return res
     })
   }
 
@@ -37,10 +44,22 @@ function toItemsTest (types: Rule[]): TestFn<any> {
   const tests = types.map(type => type._compile())
 
   return function (value, path, context, next) {
-    return promiseUnion(tests.map((test, index) => {
-      return function () {
-        return test(value, path, context, identity)
+    let res = 0
+    let test: TestFn<any>
+
+    for (let i = 0; i < tests.length; i++) {
+      const check = types[i]._isType(value)
+
+      if (check > res) {
+        res = check
+        test = tests[i]
       }
-    })).then(res => next(res))
+    }
+
+    if (res === 0) {
+      throw context.error(path, 'Union', 'types', types, value)
+    }
+
+    return test(value, path, context, next)
   }
 }

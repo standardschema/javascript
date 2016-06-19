@@ -17,9 +17,9 @@ test('pattern', t => {
     })
 
     t.test('structural check', t => {
-      t.equal(schema._isType('TEST'), false)
-      t.equal(schema._isType(123), false)
-      t.equal(schema._isType('lower'), true)
+      t.equal(schema._isType('TEST'), 0)
+      t.equal(schema._isType(123), 0)
+      t.equal(schema._isType('lower'), 3)
       t.end()
     })
 

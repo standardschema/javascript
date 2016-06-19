@@ -23,7 +23,7 @@ export class Pattern extends String implements PatternOptions {
 
   _isType (value: any) {
     return wrapIsType(this, value, super._isType, (value) => {
-      return this._regexp.test(value)
+      return this._regexp.test(value) ? 1 : 0
     })
   }
 

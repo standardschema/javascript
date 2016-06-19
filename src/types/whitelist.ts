@@ -21,7 +21,7 @@ export class Whitelist extends Rule implements WhitelistOptions {
   }
 
   _isType (value: any) {
-    return this.whitelist.indexOf(value) > -1
+    return this.whitelist.indexOf(value) > -1 ? 1 : 0
   }
 
 }

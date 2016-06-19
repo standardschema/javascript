@@ -42,27 +42,3 @@ export function promiseEvery <T> (fns: Array<() => Promise<T>>): Promise<T[]> {
     Promise.resolve(results)
   ).then((res) => err ? Promise.reject(err) : res)
 }
-
-/**
- * Try and resolve any promise.
- */
-export function promiseUnion <T> (fns: Array<() => Promise<T>>): Promise<T> {
-  return fns.reduce(
-    function (result, next, index) {
-      // Execute the `next()` function, ignoring the `TypeError`.
-      if (index === 0) {
-        return result.catch(() => next())
-      }
-
-      // Catch any previous errors, stopping if it is not a validation error.
-      return result.catch(function (err) {
-        if (!(err instanceof ValidationError)) {
-          return Promise.reject(err)
-        }
-
-        return next()
-      })
-    },
-    Promise.reject<T>(new TypeError('Promise union is empty'))
-  )
-}

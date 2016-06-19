@@ -36,12 +36,12 @@ export class Any extends Rule implements AnyOptions {
     this._tests.push(toRequiredTest(this.required))
   }
 
-  _isType (value: any) {
+  _isType (value: any): number {
     if (this.required) {
-      return value != null
+      return value == null ? 0 : 1
     }
 
-    return true // Any value assigns to `any`.
+    return 1 // Any value assigns to `any`.
   }
 
   /**

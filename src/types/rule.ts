@@ -32,14 +32,14 @@ export class Rule implements RuleOptions {
   /**
    * Synchronous, structural type-check.
    */
-  _isType (value: any) {
-    return false
+  _isType (value: any): number {
+    return 0
   }
 
   /**
    * Check whether a type is a sub-type of this type.
    */
-  _typeOf (other: Rule) {
+  _typeOf (other: Rule): boolean {
     return other instanceof this.constructor
   }
 

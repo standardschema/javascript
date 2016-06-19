@@ -16,7 +16,7 @@ export class Url extends String implements UrlOptions {
 
   _isType (value: any) {
     return wrapIsType(this, value, super._isType, (value) => {
-      return validator.isURL(value)
+      return validator.isURL(value) ? 1 : 0
     })
   }
 

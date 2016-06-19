@@ -17,7 +17,7 @@ export class Boolean extends Any implements BooleanOptions {
 
   _isType (value: any) {
     return wrapIsType(this, value, super._isType, (value) => {
-      return typeof value === 'boolean'
+      return typeof value === 'boolean' ? 1 : 0
     })
   }
 

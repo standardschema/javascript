@@ -23,7 +23,7 @@ export class Uuid extends String implements UuidOptions {
 
   _isType (value: any) {
     return wrapIsType(this, value, super._isType, (value) => {
-      return validator.isUUID(value)
+      return validator.isUUID(value) ? 1 : 0
     })
   }
 

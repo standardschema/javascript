@@ -37,7 +37,7 @@ export class String extends Any implements StringOptions {
 
   _isType (value: any) {
     return wrapIsType(this, value, super._isType, (value) => {
-      return typeof value === 'string'
+      return typeof value === 'string' ? 1 : 0
     })
   }
 

@@ -25,7 +25,7 @@ export class Tuple extends Any implements TupleOptions {
 
   _isType (value: any) {
     return wrapIsType(this, value, super._isType, (value) => {
-      return value.length === this.tuple.length
+      return value.length === this.tuple.length ? 1 : 0
     })
   }
 

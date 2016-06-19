@@ -23,9 +23,19 @@ export class Intersection extends Any implements IntersectionOptions {
 
   _isType (value: any) {
     return wrapIsType(this, value, super._isType, (value) => {
-      return this.types.every(function (type) {
-        return type._isType(value)
-      })
+      let res = 0
+
+      for (const type of this.types) {
+        const check = type._isType(value)
+
+        if (check === 0) {
+          return 0
+        }
+
+        res += check
+      }
+
+      return res
     })
   }
 
