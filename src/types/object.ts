@@ -55,7 +55,7 @@ export class Object extends Any implements ObjectOptions {
           return 0
         }
 
-        res += 1
+        res += check
       }
 
       // Check the rest of keys against key/value types.
@@ -68,7 +68,7 @@ export class Object extends Any implements ObjectOptions {
               return 0
             }
 
-            res += 1
+            res += check
           }
         }
       }
