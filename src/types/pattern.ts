@@ -1,3 +1,4 @@
+import omit = require('object.omit')
 import { String, StringOptions } from './string'
 import { TestFn, wrapIsType } from '../utils'
 
@@ -25,6 +26,10 @@ export class Pattern extends String implements PatternOptions {
     return wrapIsType(this, value, super._isType, (value) => {
       return this._regexp.test(value) ? 1 : 0
     })
+  }
+
+  toJSON () {
+    return omit(this, ['_tests', '_regexp'])
   }
 
 }

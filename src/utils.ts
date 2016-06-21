@@ -1,9 +1,9 @@
-import xtend = require('xtend')
 import Promise = require('any-promise')
 import { ValidationError } from './support/error'
 import { Rule } from './types/rule'
 
 const IS_VALID_IDENTIFIER = /^[A-Za-z_$][A-Za-z0-9_$]*$/
+const _toString = Object.prototype.toString
 const _hasOwnProperty = Object.prototype.hasOwnProperty
 
 /**
@@ -198,10 +198,61 @@ export function wrapIsType <T> (
 }
 
 /**
+ * Deep extend data.
+ */
+export function extend (obj: any, child: any) {
+  if (_toString.call(child) === '[object Object]') {
+    if (Array.isArray(obj)) {
+      if (Array.isArray(child)) {
+        return obj.concat(child)
+      }
+
+      return child
+    }
+
+    if (_toString.call(obj) === '[object Object]') {
+      for (const key of Object.keys(child)) {
+        if (obj[key]) {
+          obj[key] = extend(obj[key], child[key])
+        } else {
+          obj[key] = child[key]
+        }
+      }
+
+      return obj
+    }
+
+    return child
+  }
+
+  return child
+}
+
+/**
  * Extend a rule with new properties.
  */
-export function extend <T extends Rule> (schema: T, options: any): T {
+export function extendSchema <T extends Rule> (schema: T, options: any): T {
   const Constructor = schema.constructor as new (options: any) => T
 
-  return new Constructor(xtend(schema.toJSON(), options))
+  return new Constructor(extend(schema.toJSON(), options))
+}
+
+/**
+ * Merge two types together.
+ */
+export function mergeSchema <T extends Rule, U extends T> (type: T, subtype: U): U {
+  return extendSchema(subtype, type.toJSON())
+}
+
+/**
+ * Merge a list of values together.
+ */
+export function merge (values: any[]) {
+  let out = values[0]
+
+  for (let i = 1; i < values.length; i++) {
+    out = extend(out, values[i])
+  }
+
+  return out
 }

@@ -30,7 +30,7 @@ test('any', t => {
     })
 
     t.test('extend to new schema', t => {
-      const newSchema = Utils.extend(schema, { default: 456 })
+      const newSchema = Utils.extendSchema(schema, { default: 456 })
       const validate = compile(newSchema)
 
       return validate(null)

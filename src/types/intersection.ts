@@ -1,8 +1,8 @@
-import extend = require('xtend')
+import omit = require('object.omit')
 import { Any, AnyOptions } from './any'
 import { Rule } from './rule'
 import { promiseEvery } from '../support/promises'
-import { TestFn, identity, wrapIsType } from '../utils'
+import { TestFn, identity, wrapIsType, mergeSchema, merge } from '../utils'
 
 export interface IntersectionOptions extends AnyOptions {
   types: Rule[]
@@ -12,20 +12,22 @@ export class Intersection extends Any implements IntersectionOptions {
 
   type = 'Intersection'
   types: Rule[]
+  _types: Rule[]
 
   constructor (options: IntersectionOptions) {
     super(options)
 
     this.types = options.types
+    this._types = squashTypes(this.types)
 
-    this._tests.push(toIntersectionTest(this.types))
+    this._tests.push(toIntersectionTest(this._types))
   }
 
   _isType (value: any) {
     return wrapIsType(this, value, super._isType, (value) => {
       let res = 0
 
-      for (const type of this.types) {
+      for (const type of this._types) {
         const check = type._isType(value)
 
         if (check === 0) {
@@ -39,12 +41,14 @@ export class Intersection extends Any implements IntersectionOptions {
     })
   }
 
+  toJSON () {
+    return omit(this, ['_tests', '_types'])
+  }
+
 }
 
 /**
  * Run all validation types.
- *
- * TODO: Make this merge types in the intersection, instead of values.
  */
 function toIntersectionTest (types: Rule[]): TestFn<any> {
   const tests = types.map(type => type._compile())
@@ -61,18 +65,30 @@ function toIntersectionTest (types: Rule[]): TestFn<any> {
 }
 
 /**
- * Merge an array of values.
+ * Optimise the shape of types.
  */
-function merge (values: any[]) {
-  let out = values[0]
+function squashTypes (types: Rule[]): Rule[] {
+  return types
+    .reduce(
+      function (out, type) {
+        for (let i = 0; i < out.length; i++) {
+          const res = out[i]
 
-  for (let i = 1; i < values.length; i++) {
-    if (typeof values[i] === 'object') {
-      out = extend(out, values[i])
-    } else {
-      out = values[i]
-    }
-  }
+          if (res._typeOf(type)) {
+            out[i] = mergeSchema(res, type)
+            return out
+          }
 
-  return out
+          if (type._typeOf(res)) {
+            out[i] = mergeSchema(type, res)
+            return out
+          }
+        }
+
+        out.push(type)
+
+        return out
+      },
+      [] as Rule[]
+    )
 }

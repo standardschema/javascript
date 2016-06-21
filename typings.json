@@ -11,7 +11,6 @@
   "dependencies": {
     "make-error-cause": "npm:make-error-cause",
     "object.omit": "registry:npm/object.omit#2.0.0+20160621011911",
-    "validator": "registry:npm/validator#4.5.1+20160429171724",
-    "xtend": "registry:npm/xtend#4.0.0+20160211003958"
+    "validator": "registry:npm/validator#4.5.1+20160429171724"
   }
 }
