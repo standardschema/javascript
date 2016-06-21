@@ -61,4 +61,42 @@ test('object', t => {
         })
     })
   })
+
+  t.test('key count', t => {
+    const schema = new Types.Object({
+      propertyTypes: [
+        [
+          new Types.Any(),
+          new Types.Number()
+        ]
+      ],
+      minKeys: 2
+    })
+
+    const validate = compile(schema)
+
+    t.test('is structural type', t => {
+      t.equal(schema._isType({ a: 123 }), 0)
+      t.equal(schema._isType({ a: 123, b: 456 }), 5)
+      t.end()
+    })
+
+    t.test('accept valid property types', t => {
+      return validate({ a: 123, b: 456 })
+        .then(function (res) {
+          t.equal(res.a, 123)
+          t.equal(res.b, 456)
+        })
+    })
+
+    t.test('error on bad property count', t => {
+      t.plan(2)
+
+      return validate({ a: 123 })
+        .catch(function (err) {
+          t.equal(err.errors.length, 1)
+          t.deepEqual(err.errors[0].path, [])
+        })
+    })
+  })
 })

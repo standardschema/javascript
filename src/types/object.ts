@@ -5,6 +5,8 @@ import { promiseEvery } from '../support/promises'
 import { TestFn, Context, CompiledFn, identity, NextFunction, wrapIsType } from '../utils'
 
 export interface ObjectOptions extends AnyOptions {
+  minKeys?: number
+  maxKeys?: number
   properties?: ObjectProperties
   propertyTypes?: ObjectPropertyTypes
 }
@@ -18,11 +20,21 @@ export type ObjectPropertyTypes = Array<[Rule, Rule]>
 export class Object extends Any implements ObjectOptions {
 
   type = 'Object'
+  minKeys: number
+  maxKeys: number
   properties: ObjectProperties = {}
   propertyTypes: ObjectPropertyTypes = []
 
   constructor (options: ObjectOptions) {
     super(options)
+
+    if (options.minKeys != null) {
+      this.minKeys = options.minKeys
+    }
+
+    if (options.maxKeys != null) {
+      this.maxKeys = options.maxKeys
+    }
 
     if (options.properties != null) {
       this.properties = options.properties
@@ -33,7 +45,7 @@ export class Object extends Any implements ObjectOptions {
     }
 
     this._tests.push(isObject)
-    this._tests.push(toPropertiesTest(this.properties, this.propertyTypes))
+    this._tests.push(toPropertiesTest(this.properties, this.propertyTypes, this.minKeys, this.maxKeys))
   }
 
   /**
@@ -44,6 +56,16 @@ export class Object extends Any implements ObjectOptions {
       let res = 0
 
       if (typeof object !== 'object') {
+        return 0
+      }
+
+      const keys = global.Object.keys(object)
+
+      if (this.minKeys != null && keys.length < this.minKeys) {
+        return 0
+      }
+
+      if (this.maxKeys != null && keys.length > this.maxKeys) {
         return 0
       }
 
@@ -59,7 +81,7 @@ export class Object extends Any implements ObjectOptions {
       }
 
       // Check the rest of keys against key/value types.
-      for (const key of global.Object.keys(object)) {
+      for (const key of keys) {
         for (const [keyType, valueType] of this.propertyTypes) {
           if (keyType._isType(key)) {
             const check = valueType._isType(object[key])
@@ -93,7 +115,12 @@ function isObject (value: any, path: string[], context: Context, next: NextFunct
 /**
  * Test all properties in an object definition.
  */
-function toPropertiesTest (properties: ObjectProperties, propertyTypes: ObjectPropertyTypes): TestFn<any> {
+function toPropertiesTest (
+  properties?: ObjectProperties,
+  propertyTypes?: ObjectPropertyTypes,
+  minKeys?: number,
+  maxKeys?: number
+): TestFn<any> {
   const propertyTypeTests = propertyTypes
     .map<[Rule, CompiledFn<any>, CompiledFn<any>]>(function (pair) {
       const [keyType, valueType] = pair
@@ -106,8 +133,20 @@ function toPropertiesTest (properties: ObjectProperties, propertyTypes: ObjectPr
       return [key, properties[key]._compile()]
     })
 
+  const minKeyCount = minKeys == null ? 0 : minKeys
+  const maxKeyCount = maxKeys == null ? Infinity : maxKeys
+
   return function (object, path, context, next) {
+    const keys = global.Object.keys(object)
     const testMap: { [key: string]: Array<(path: string[], tuple: [string, any]) => Promise<[any, any]>> } = {}
+
+    if (keys.length < minKeyCount) {
+      throw context.error(path, 'Object', 'minKeys', minKeys, keys.length)
+    }
+
+    if (keys.length > maxKeyCount) {
+      throw context.error(path, 'Object', 'maxKeys', maxKeys, keys.length)
+    }
 
     for (const [key, test] of propertyTests) {
       pushKey(testMap, key, function (path: string[], [key, value]: [string, any]) {
@@ -115,7 +154,7 @@ function toPropertiesTest (properties: ObjectProperties, propertyTypes: ObjectPr
       })
     }
 
-    for (const key of global.Object.keys(object)) {
+    for (const key of keys) {
       for (const [keyType, keyTest, valueTest] of propertyTypeTests) {
         if (keyType._isType(key)) {
           pushKey(testMap, key, function (path: string[], [key, value]: [string, any]) {
