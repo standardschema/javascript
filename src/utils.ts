@@ -1,3 +1,4 @@
+import xtend = require('xtend')
 import Promise = require('any-promise')
 import { ValidationError } from './support/error'
 import { Rule } from './types/rule'
@@ -194,4 +195,13 @@ export function wrapIsType <T> (
   }
 
   return result + check
+}
+
+/**
+ * Extend a rule with new properties.
+ */
+export function extend <T extends Rule> (schema: T, options: any): T {
+  const Constructor = schema.constructor as new (options: any) => T
+
+  return new Constructor(xtend(schema.toJSON(), options))
 }

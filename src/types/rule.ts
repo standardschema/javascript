@@ -1,3 +1,4 @@
+import omit = require('object.omit')
 import { TestFn, CompiledFn, compose } from '../utils'
 
 export interface RuleOptions {
@@ -48,6 +49,13 @@ export class Rule implements RuleOptions {
    */
   _compile (): CompiledFn<any> {
     return compose(this._tests)
+  }
+
+  /**
+   * Output as a JSON object.
+   */
+  toJSON () {
+    return omit(this, ['_tests'])
   }
 
 }

@@ -1,5 +1,5 @@
 import test = require('blue-tape')
-import { Types, compile } from '../index'
+import { Types, Utils, compile } from '../index'
 
 test('any', t => {
   t.test('default value', t => {
@@ -26,6 +26,16 @@ test('any', t => {
       return validate('abc')
         .then(res => {
           t.equal(res, 'abc')
+        })
+    })
+
+    t.test('extend to new schema', t => {
+      const newSchema = Utils.extend(schema, { default: 456 })
+      const validate = compile(newSchema)
+
+      return validate(null)
+        .then(res => {
+          t.equal(res, 456)
         })
     })
   })
