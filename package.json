@@ -9,7 +9,7 @@
   "scripts": {
     "lint": "tslint \"src/**/*.ts\" -e \"src/typings/**\"",
     "build": "rm -rf dist && tsc",
-    "test-spec": "blue-tape \"dist/**/*.spec.js\" | tap-spec",
+    "test-spec": "blue-tape \"dist/**/*.spec.js\"",
     "test-cov": "istanbul cover --print none node_modules/blue-tape/bin/blue-tape.js -- \"dist/**/*.spec.js\" | tap-spec",
     "test": "npm run lint && npm run build && npm run test-cov",
     "prepublish": "typings install && npm run build"

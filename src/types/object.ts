@@ -2,7 +2,7 @@ import Promise = require('any-promise')
 import { Rule } from './rule'
 import { Any, AnyOptions } from './any'
 import { promiseEvery } from '../support/promises'
-import { TestFn, Context, CompiledFn, identity, NextFunction, wrapIsType } from '../utils'
+import { TestFn, Context, CompiledFn, identity, NextFunction, wrapIsType, merge } from '../utils'
 
 export interface ObjectOptions extends AnyOptions {
   minKeys?: number
@@ -97,6 +97,23 @@ export class Object extends Any implements ObjectOptions {
 
       return res
     })
+  }
+
+  /**
+   * Override `_extend` to concat `properties` and `propertyTypes`.
+   */
+  _extend (options: any): any {
+    const result: ObjectOptions = super._extend(options)
+
+    if (options.properties) {
+      result.properties = merge(this.properties, options.properties)
+    }
+
+    if (options.propertyTypes) {
+      result.propertyTypes = this.propertyTypes.concat(options.propertyTypes)
+    }
+
+    return result
   }
 
 }

@@ -198,34 +198,10 @@ export function wrapIsType <T> (
 }
 
 /**
- * Deep extend data.
+ * Check the value is an object.
  */
-export function extend (obj: any, child: any) {
-  if (_toString.call(child) === '[object Object]') {
-    if (Array.isArray(obj)) {
-      if (Array.isArray(child)) {
-        return obj.concat(child)
-      }
-
-      return child
-    }
-
-    if (_toString.call(obj) === '[object Object]') {
-      for (const key of Object.keys(child)) {
-        if (obj[key]) {
-          obj[key] = extend(obj[key], child[key])
-        } else {
-          obj[key] = child[key]
-        }
-      }
-
-      return obj
-    }
-
-    return child
-  }
-
-  return child
+function isObject (obj: any) {
+  return _toString.call(obj) === '[object Object]'
 }
 
 /**
@@ -234,7 +210,7 @@ export function extend (obj: any, child: any) {
 export function extendSchema <T extends Rule> (schema: T, options: any): T {
   const Constructor = schema.constructor as new (options: any) => T
 
-  return new Constructor(extend(schema.toJSON(), options))
+  return new Constructor(schema._extend(options))
 }
 
 /**
@@ -247,11 +223,29 @@ export function mergeSchema <T extends Rule, U extends T> (type: T, subtype: U):
 /**
  * Merge a list of values together.
  */
-export function merge (values: any[]) {
-  let out = values[0]
+export function merge (...values: any[]) {
+  let out: any
 
-  for (let i = 1; i < values.length; i++) {
-    out = extend(out, values[i])
+  for (const value of values) {
+    if (isObject(value)) {
+      if (isObject(out)) {
+        const res: any = {}
+
+        for (const key of Object.keys(out)) {
+          res[key] = out[key]
+        }
+
+        for (const key of Object.keys(value)) {
+          res[key] = value[key]
+        }
+
+        out = res
+      } else {
+        out = value
+      }
+    } else {
+      out = value
+    }
   }
 
   return out

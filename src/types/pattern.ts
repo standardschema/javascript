@@ -1,4 +1,3 @@
-import omit = require('object.omit')
 import { String, StringOptions } from './string'
 import { TestFn, wrapIsType } from '../utils'
 
@@ -29,7 +28,9 @@ export class Pattern extends String implements PatternOptions {
   }
 
   toJSON () {
-    return omit(this, ['_tests', '_regexp'])
+    const json = super.toJSON()
+    delete json._regexp
+    return json
   }
 
 }

@@ -57,10 +57,16 @@ function toIntersectionTest (types: Rule[]): TestFn<any> {
     const result = promiseEvery(tests.map((test) => {
       return function () {
         return test(value, path, context, identity)
+          .then(result => {
+            // Merge each result with the original value for subsequent tests.
+            value = merge(value, result)
+
+            return result
+          })
       }
     }))
 
-    return result.then(merge).then(res => next(res))
+    return result.then(values => merge(...values)).then(res => next(res))
   }
 }
 

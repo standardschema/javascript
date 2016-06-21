@@ -58,6 +58,19 @@ export class Any extends Rule implements AnyOptions {
     ])
   }
 
+  /**
+   * Override `_extend` to concat `uses`.
+   */
+  _extend (options: any): any {
+    const result: AnyOptions = super._extend(options)
+
+    if (options.uses) {
+      result.uses = this.uses.concat(options.uses)
+    }
+
+    return result
+  }
+
 }
 
 /**

@@ -1,5 +1,5 @@
 import omit = require('object.omit')
-import { TestFn, CompiledFn, compose } from '../utils'
+import { TestFn, CompiledFn, compose, merge } from '../utils'
 
 export interface RuleOptions {
   description?: string
@@ -49,6 +49,13 @@ export class Rule implements RuleOptions {
    */
   _compile (): CompiledFn<any> {
     return compose(this._tests)
+  }
+
+  /**
+   * Use `_extend` to provide option merging.
+   */
+  _extend (options: any): any {
+    return merge(this.toJSON(), options)
   }
 
   /**
