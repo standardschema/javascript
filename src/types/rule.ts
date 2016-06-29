@@ -1,5 +1,5 @@
-import omit = require('object.omit')
-import { TestFn, CompiledFn, compose, merge } from '../utils'
+import extend = require('xtend')
+import { TestFn, CompiledFn, compose, Context } from '../utils'
 
 export interface RuleOptions {
   description?: string
@@ -33,8 +33,8 @@ export class Rule implements RuleOptions {
   /**
    * Synchronous, structural type-check.
    */
-  _isType (value: any): number {
-    return 0
+  _isType (value: any, path: string[], context: Context): number {
+    throw context.error(path, 'Rule', 'type', 'Rule', value)
   }
 
   /**
@@ -54,15 +54,19 @@ export class Rule implements RuleOptions {
   /**
    * Use `_extend` to provide option merging.
    */
-  _extend (options: any): any {
-    return merge(this.toJSON(), options)
+  _extend (options: RuleOptions): RuleOptions {
+    const res = extend(this, options) as RuleOptions
+    delete (res as this)._tests
+    return res
   }
 
   /**
    * Output as a JSON object.
    */
-  toJSON () {
-    return omit(this, ['_tests'])
+  toJSON (): any {
+    const json = extend(this)
+    delete json._tests
+    return json
   }
 
 }

@@ -177,24 +177,20 @@ export function formatPath (segments: string[]): string {
  * Call `_isType` on parent, handling `null`.
  */
 export function wrapIsType <T> (
-  context: any,
+  _this: any,
   value: any,
-  _test: (value: any) => number,
-  test: (value: any) => number
+  path: string[],
+  context: Context,
+  _test: (value: any, path: string[], context: Context) => number,
+  test: (value: any, path: string[], context: Context) => number
 ): number {
-  const result = _test.call(context, value)
+  const result = _test.call(_this, value, path, context)
 
-  if (value == null || value === 0) {
+  if (value == null) {
     return result
   }
 
-  const check = test.call(context, value)
-
-  if (check === 0) {
-    return 0
-  }
-
-  return result + check
+  return result + test.call(_this, value, path, context)
 }
 
 /**
@@ -211,13 +207,6 @@ export function extendSchema <T extends Rule> (schema: T, options: any): T {
   const Constructor = schema.constructor as new (options: any) => T
 
   return new Constructor(schema._extend(options))
-}
-
-/**
- * Merge two types together.
- */
-export function mergeSchema <T extends Rule, U extends T> (type: T, subtype: U): U {
-  return extendSchema(subtype, type.toJSON())
 }
 
 /**
@@ -249,4 +238,15 @@ export function merge (...values: any[]) {
   }
 
   return out
+}
+
+/**
+ * Check if a value matches a schema structurally.
+ */
+export function isType (schema: Rule, value: any, path: string[], context: Context) {
+  try {
+    return schema._isType(value, path, context)
+  } catch (err) {
+    return 0
+  }
 }

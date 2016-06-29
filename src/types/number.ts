@@ -28,9 +28,13 @@ export class Number extends Any implements NumberOptions {
     this._tests.push(toMaxTest(this.max))
   }
 
-  _isType (value: any) {
-    return wrapIsType(this, value, super._isType, (value) => {
-      return typeof value === 'number' ? 1 : 0
+  _isType (value: any, path: string[], context: Context) {
+    return wrapIsType(this, value, path, context, super._isType, (value) => {
+      if (typeof value === 'number') {
+        return 1
+      }
+
+      throw context.error(path, 'Number', 'type', 'Number', value)
     })
   }
 

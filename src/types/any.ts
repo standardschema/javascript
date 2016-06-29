@@ -1,5 +1,5 @@
 import assert = require('assert')
-import { TestFn, CompiledFn, compose, toNext, Ref, toValue } from '../utils'
+import { TestFn, CompiledFn, compose, toNext, Ref, toValue, Context } from '../utils'
 import { Rule, RuleOptions } from './rule'
 
 export interface AnyOptions extends RuleOptions {
@@ -36,13 +36,13 @@ export class Any extends Rule implements AnyOptions {
     this._tests.push(toRequiredTest(this.required))
   }
 
-  _isType (value: any): number {
+  _isType (value: any, path: string[], context: Context): number {
     if (value == null) {
       if (this.required === false || this.default != null) {
         return 1
       }
 
-      return 0
+      throw context.error(path, 'Any', 'required', this.required, value)
     }
 
     return 1 // Any value assigns to `any`.
@@ -54,21 +54,30 @@ export class Any extends Rule implements AnyOptions {
   _compile (): CompiledFn<any> {
     return compose([
       super._compile(),
-      compose(this.uses.map(type => type._compile()))
+      ...this.uses.map(type => type._compile())
     ])
   }
 
   /**
    * Override `_extend` to concat `uses`.
    */
-  _extend (options: any): any {
-    const result: AnyOptions = super._extend(options)
+  _extend (options: AnyOptions): AnyOptions {
+    const result = super._extend(options) as AnyOptions
 
     if (options.uses) {
       result.uses = this.uses.concat(options.uses)
     }
 
     return result
+  }
+
+  /**
+   * Override `toJSON` to serialise `uses` to JSON types.
+   */
+  toJSON () {
+    const json = super.toJSON()
+    json.uses = this.uses.map(x => x.toJSON())
+    return json
   }
 
 }

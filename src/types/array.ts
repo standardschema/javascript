@@ -1,6 +1,8 @@
+import extend = require('xtend')
 import assert = require('assert')
 import { Rule } from './rule'
 import { Any, AnyOptions } from './any'
+import { Intersection } from './intersection'
 import { Context, TestFn, NextFunction, Ref, toValue, toNext, wrapIsType } from '../utils'
 import { promiseEvery } from '../support/promises'
 
@@ -38,10 +40,26 @@ export class Array extends Any implements ArrayOptions {
     this._tests.push(toMaxItemsTest(this.maxItems))
   }
 
-  _isType (value: any) {
-    return wrapIsType(this, value, super._isType, (value) => {
-      return global.Array.isArray(value) ? 1 : 0
+  _isType (value: any, path: string[], context: Context) {
+    return wrapIsType(this, value, path, context, super._isType, (value) => {
+      if (!global.Array.isArray(value)) {
+        return 1
+      }
+
+      throw context.error(path, 'Array', 'type', 'Array', value)
     })
+  }
+
+  _extend (options: ArrayOptions): ArrayOptions {
+    return extend(super._extend(options), {
+      items: Intersection.intersect(this.items, options.items)
+    })
+  }
+
+  toJSON () {
+    const json = super.toJSON()
+    json.items = this.items.toJSON()
+    return json
   }
 
 }

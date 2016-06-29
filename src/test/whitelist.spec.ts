@@ -8,11 +8,6 @@ test('whitelist', t => {
 
   const validate = compile(schema)
 
-  t.test('is type', t => {
-    t.ok(schema._isType(2))
-    t.end()
-  })
-
   t.test('accept valid values', t => {
     return validate(2)
   })

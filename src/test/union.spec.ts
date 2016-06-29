@@ -30,12 +30,14 @@ test('union', t => {
     })
 
     t.test('reject invalid input', t => {
-      t.plan(2)
+      t.plan(4)
 
       return validate({ foo: 'bar' })
         .catch(function (err) {
-          t.equal(err.errors.length, 1)
-          t.deepEqual(err.errors[0].path, [])
+          t.equal(err.errors.length, 3)
+          t.deepEqual(err.errors[0].path, ['userId'])
+          t.deepEqual(err.errors[1].path, ['profileId'])
+          t.deepEqual(err.errors[2].path, [])
         })
     })
   })

@@ -1,5 +1,5 @@
 import test = require('blue-tape')
-import { Types, compile } from '../index'
+import { Types, compile, assert } from '../index'
 
 test('object', t => {
   t.test('properties', t => {
@@ -39,7 +39,7 @@ test('object', t => {
     const validate = compile(schema)
 
     t.test('is structural type', t => {
-      t.ok(schema._isType({ '123': 'abc' }))
+      t.equal(assert(schema, { '123': 'abc' }), 3)
       t.end()
     })
 
@@ -76,8 +76,8 @@ test('object', t => {
     const validate = compile(schema)
 
     t.test('is structural type', t => {
-      t.equal(schema._isType({ a: 123 }), 0)
-      t.equal(schema._isType({ a: 123, b: 456 }), 5)
+      t.throws(() => assert(schema, { a: 123 }))
+      t.equal(assert(schema, { a: 123, b: 456 }), 5)
       t.end()
     })
 

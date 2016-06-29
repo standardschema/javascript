@@ -1,5 +1,5 @@
 import test = require('blue-tape')
-import { Types, compile } from '../index'
+import { Types, compile, assert } from '../index'
 
 test('pattern', t => {
   t.test('basic', t => {
@@ -17,9 +17,9 @@ test('pattern', t => {
     })
 
     t.test('structural check', t => {
-      t.equal(schema._isType('TEST'), 0)
-      t.equal(schema._isType(123), 0)
-      t.equal(schema._isType('lower'), 3)
+      t.throws(() => assert(schema, 'TEST'))
+      t.throws(() => assert(schema, 123))
+      t.equal(assert(schema, 'lower'), 3)
       t.end()
     })
 

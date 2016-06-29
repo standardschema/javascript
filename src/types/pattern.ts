@@ -1,5 +1,5 @@
 import { String, StringOptions } from './string'
-import { TestFn, wrapIsType } from '../utils'
+import { TestFn, wrapIsType, Context } from '../utils'
 
 export interface PatternOptions extends StringOptions {
   pattern: string
@@ -21,10 +21,20 @@ export class Pattern extends String implements PatternOptions {
     this._tests.push(toPatternTest(this.pattern, this._regexp))
   }
 
-  _isType (value: any) {
-    return wrapIsType(this, value, super._isType, (value) => {
-      return this._regexp.test(value) ? 1 : 0
+  _isType (value: any, path: string[], context: Context) {
+    return wrapIsType(this, value, path, context, super._isType, (value) => {
+      if (this._regexp.test(value)) {
+        return 1
+      }
+
+      throw context.error(path, 'Pattern', 'pattern', this.pattern, value)
     })
+  }
+
+  _extend (options: PatternOptions): PatternOptions {
+    const res = super._extend(options) as PatternOptions
+    delete (res as this)._regexp
+    return res
   }
 
   toJSON () {

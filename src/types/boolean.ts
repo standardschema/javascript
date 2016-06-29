@@ -1,9 +1,7 @@
 import { Any, AnyOptions } from './any'
 import { Context, NextFunction, wrapIsType } from '../utils'
 
-export interface BooleanOptions extends AnyOptions {
-
-}
+export interface BooleanOptions extends AnyOptions {}
 
 export class Boolean extends Any implements BooleanOptions {
 
@@ -15,10 +13,18 @@ export class Boolean extends Any implements BooleanOptions {
     this._tests.push(isBoolean)
   }
 
-  _isType (value: any) {
-    return wrapIsType(this, value, super._isType, (value) => {
-      return typeof value === 'boolean' ? 1 : 0
+  _isType (value: any, path: string[], context: Context) {
+    return wrapIsType(this, value, path, context, super._isType, (value) => {
+      if (typeof value === 'boolean') {
+        return 1
+      }
+
+      throw context.error(path, 'Boolean', 'type', 'Boolean', value)
     })
+  }
+
+  _extend (options: BooleanOptions): BooleanOptions {
+    return super._extend(options)
   }
 
 }

@@ -41,3 +41,16 @@ export function compile (rootSchema: Types.Rule) {
       })
   }
 }
+
+/**
+ * Run a type check assertion.
+ */
+export function assert (rootSchema: Types.Rule, root: any) {
+  const context: Utils.Context = { root, rootSchema, error }
+
+  function error (path: string[], type: string, keyword: string, assertion: any, value: any) {
+    return new ValidationError(path, type, keyword, assertion, value)
+  }
+
+  return rootSchema._isType(root, [], context)
+}

@@ -1,5 +1,5 @@
 import test = require('blue-tape')
-import { Types } from '../index'
+import { Types, assert } from '../index'
 
 test('utils', t => {
   t.test('merge less specific type into more specific type', t => {
@@ -14,10 +14,10 @@ test('utils', t => {
       ]
     })
 
-    t.equal(schema._isType('HEY'), 0)
-    t.equal(schema._isType('123'), 0)
-    t.equal(schema._isType('a'), 4)
-    t.equal(schema._isType('hey'), 4)
+    t.throws(() => assert(schema, 'HEY'))
+    t.throws(() => assert(schema, '123'))
+    t.doesNotThrow(() => assert(schema, 'a'))
+    t.doesNotThrow(() => assert(schema, 'hey'))
     t.end()
   })
 })

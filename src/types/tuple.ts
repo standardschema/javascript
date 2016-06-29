@@ -1,8 +1,9 @@
 import assert = require('assert')
 import { Rule } from './rule'
 import { Any, AnyOptions } from './any'
+import { Intersection } from './intersection'
 import { promiseEvery } from '../support/promises'
-import { TestFn, identity, wrapIsType } from '../utils'
+import { TestFn, identity, wrapIsType, Context } from '../utils'
 
 export interface TupleOptions extends AnyOptions {
   tuple: Rule[]
@@ -23,10 +24,36 @@ export class Tuple extends Any implements TupleOptions {
     this._tests.push(toTupleTest(options.tuple))
   }
 
-  _isType (value: any) {
-    return wrapIsType(this, value, super._isType, (value) => {
-      return value.length === this.tuple.length ? 1 : 0
+  _isType (value: any, path: string[], context: Context) {
+    return wrapIsType(this, value, path, context, super._isType, (value) => {
+      if (value.length === this.tuple.length) {
+        return 1
+      }
+
+      throw context.error(path, 'Tuple', 'tuple', this.tuple.length, value)
     })
+  }
+
+  _extend (options: TupleOptions): TupleOptions {
+    const res = super._extend(options) as TupleOptions
+
+    if (options.tuple) {
+      const len = Math.max(this.tuple.length, options.tuple.length)
+
+      res.tuple = new Array(len)
+
+      for (let i = 0; i < len; i++) {
+        res.tuple[i] = Intersection.intersect(this.tuple[i], options.tuple[i])
+      }
+    }
+
+    return res
+  }
+
+  toJSON () {
+    const json = super.toJSON()
+    json.tuple = this.tuple.map(x => x.toJSON())
+    return json
   }
 
 }

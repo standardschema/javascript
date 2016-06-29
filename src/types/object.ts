@@ -1,8 +1,10 @@
+import extend = require('xtend')
 import Promise = require('any-promise')
 import { Rule } from './rule'
 import { Any, AnyOptions } from './any'
+import { Intersection } from './intersection'
 import { promiseEvery } from '../support/promises'
-import { TestFn, Context, CompiledFn, identity, NextFunction, wrapIsType, merge } from '../utils'
+import { TestFn, Context, CompiledFn, identity, NextFunction, wrapIsType, isType } from '../utils'
 
 export interface ObjectOptions extends AnyOptions {
   minKeys?: number
@@ -51,46 +53,35 @@ export class Object extends Any implements ObjectOptions {
   /**
    * Check if an object matches the schema structure.
    */
-  _isType (object: any) {
-    return wrapIsType(this, object, super._isType, (object) => {
-      let res = 0
-
-      if (typeof object !== 'object') {
-        return 0
+  _isType (value: any, path: string[], context: Context) {
+    return wrapIsType(this, value, path, context, super._isType, (value) => {
+      if (typeof value !== 'object') {
+        throw context.error(path, 'Object', 'type', 'Object', value)
       }
 
-      const keys = global.Object.keys(object)
+      let res = 0
+      const keys = global.Object.keys(value)
 
       if (this.minKeys != null && keys.length < this.minKeys) {
-        return 0
+        throw context.error(path, 'Object', 'minKeys', this.minKeys, keys.length)
       }
 
       if (this.maxKeys != null && keys.length > this.maxKeys) {
-        return 0
+        throw context.error(path, 'Object', 'maxKeys', this.maxKeys, keys.length)
       }
 
       // Check type against all valid keys.
       for (const key of global.Object.keys(this.properties)) {
-        const check = this.properties[key]._isType(object[key])
-
-        if (check === 0) {
-          return 0
-        }
-
-        res += check
+        res += this.properties[key]._isType(value[key], path.concat(key), context)
       }
 
       // Check the rest of keys against key/value types.
       for (const key of keys) {
+        const keyPath = path.concat(key)
+
         for (const [keyType, valueType] of this.propertyTypes) {
-          if (keyType._isType(key)) {
-            const check = valueType._isType(object[key])
-
-            if (check === 0) {
-              return 0
-            }
-
-            res += check
+          if (isType(keyType, key, keyPath, context)) {
+            res += valueType._isType(value[key], keyPath, context)
           }
         }
       }
@@ -102,11 +93,15 @@ export class Object extends Any implements ObjectOptions {
   /**
    * Override `_extend` to concat `properties` and `propertyTypes`.
    */
-  _extend (options: any): any {
+  _extend (options: ObjectOptions): ObjectOptions {
     const result: ObjectOptions = super._extend(options)
 
     if (options.properties) {
-      result.properties = merge(this.properties, options.properties)
+      result.properties = extend(this.properties)
+
+      for (const key of global.Object.keys(options.properties)) {
+        result.properties[key] = Intersection.intersect(this.properties[key], options.properties[key])
+      }
     }
 
     if (options.propertyTypes) {
@@ -172,12 +167,14 @@ function toPropertiesTest (
     }
 
     for (const key of keys) {
+      const keyPath = path.concat(key)
+
       for (const [keyType, keyTest, valueTest] of propertyTypeTests) {
-        if (keyType._isType(key)) {
+        if (isType(keyType, key, keyPath, context)) {
           pushKey(testMap, key, function (path: string[], [key, value]: [string, any]) {
             return promiseEvery([
-              () => keyTest(key, path, context, identity),
-              () => valueTest(value, path, context, identity)
+              () => keyTest(key, keyPath, context, identity),
+              () => valueTest(value, keyPath, context, identity)
             ])
           })
         }

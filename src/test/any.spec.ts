@@ -1,5 +1,5 @@
 import test = require('blue-tape')
-import { Types, Utils, compile } from '../index'
+import { Types, Utils, compile, assert } from '../index'
 
 test('any', t => {
   t.test('default value', t => {
@@ -10,8 +10,8 @@ test('any', t => {
     const validate = compile(schema)
 
     t.test('structural test', t => {
-      t.equal(schema._isType(null), 1)
-      t.equal(schema._isType('abc'), 1)
+      t.equal(assert(schema, null), 1)
+      t.equal(assert(schema, 'abc'), 1)
       t.end()
     })
 

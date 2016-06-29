@@ -20,8 +20,14 @@ export class Whitelist extends Rule implements WhitelistOptions {
     this._tests.push(toWhitelistTest(this.whitelist))
   }
 
-  _isType (value: any) {
-    return this.whitelist.indexOf(value) > -1 ? 1 : 0
+  _extend (options: WhitelistOptions): WhitelistOptions {
+    const res = super._extend(options) as WhitelistOptions
+
+    if (options.whitelist) {
+      res.whitelist = this.whitelist.concat(options.whitelist)
+    }
+
+    return res
   }
 
 }

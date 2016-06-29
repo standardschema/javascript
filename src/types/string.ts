@@ -35,10 +35,18 @@ export class String extends Any implements StringOptions {
     this._tests.push(toMaxLengthTest(this.maxLength))
   }
 
-  _isType (value: any) {
-    return wrapIsType(this, value, super._isType, (value) => {
-      return typeof value === 'string' ? 1 : 0
+  _isType (value: any, path: string[], context: Context) {
+    return wrapIsType(this, value, path, context, super._isType, (value) => {
+      if (typeof value === 'string') {
+        return 1
+      }
+
+      throw context.error(path, 'String', 'type', 'String', value)
     })
+  }
+
+  _extend (options: StringOptions): StringOptions {
+    return super._extend(options) as StringOptions
   }
 
 }

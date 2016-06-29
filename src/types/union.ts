@@ -1,6 +1,6 @@
 import { Any, AnyOptions } from './any'
 import { Rule } from './rule'
-import { TestFn, wrapIsType } from '../utils'
+import { TestFn, wrapIsType, Context, isType } from '../utils'
 
 export interface UnionOptions extends AnyOptions {
   types: Rule[]
@@ -19,20 +19,40 @@ export class Union extends Any implements UnionOptions {
     this._tests.push(toItemsTest(this.types))
   }
 
-  _isType (value: any) {
-    return wrapIsType(this, value, super._isType, (value) => {
+  _extend (options: UnionOptions): UnionOptions {
+    const res = super._extend(options) as UnionOptions
+
+    if (options.types) {
+      res.types = this.types.concat(options.types)
+    }
+
+    return res
+  }
+
+  _isType (value: any, path: string[], context: Context) {
+    return wrapIsType(this, value, path, context, super._isType, (value) => {
       let res = 0
 
       for (const type of this.types) {
-        const check = type._isType(value)
+        const check = isType(type, value, path, context)
 
         if (check > res) {
           res = check
         }
       }
 
+      if (res === 0) {
+        throw context.error(path, 'Union', 'types', this.types, value)
+      }
+
       return res
     })
+  }
+
+  toJSON () {
+    const json = super.toJSON()
+    json.types = this.types.map(x => x.toJSON())
+    return json
   }
 
 }
@@ -48,7 +68,7 @@ function toItemsTest (types: Rule[]): TestFn<any> {
     let test: TestFn<any>
 
     for (let i = 0; i < tests.length; i++) {
-      const check = types[i]._isType(value)
+      const check = isType(types[i], value, path, context)
 
       if (check > res) {
         res = check

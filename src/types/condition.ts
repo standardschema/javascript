@@ -26,6 +26,10 @@ export class Condition extends Rule implements ConditionOptions {
     this._tests.push(toConditionTest(this.left, this.right, this.comparator))
   }
 
+  _extend (options: ConditionOptions): ConditionOptions {
+    return super._extend(options) as ConditionOptions
+  }
+
 }
 
 /**

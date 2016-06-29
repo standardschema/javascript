@@ -14,10 +14,18 @@ export class Url extends String implements UrlOptions {
     this._tests.push(isUrl)
   }
 
-  _isType (value: any) {
-    return wrapIsType(this, value, super._isType, (value) => {
-      return validator.isURL(value) ? 1 : 0
+  _isType (value: any, path: string[], context: Context) {
+    return wrapIsType(this, value, path, context, super._isType, (value) => {
+      if (validator.isURL(value)) {
+        return 1
+      }
+
+      throw context.error(path, 'Url', 'type', 'Url', value)
     })
+  }
+
+  _extend (options: UrlOptions): UrlOptions {
+    return super._extend(options) as UrlOptions
   }
 
 }

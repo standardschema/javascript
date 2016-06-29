@@ -20,8 +20,14 @@ export class Blacklist extends Rule implements BlacklistOptions {
     this._tests.push(toBlacklistTest(this.blacklist))
   }
 
-  _isType (value: any): number {
-    return this.blacklist.indexOf(value) === -1 ? 1 : 0
+  _extend (options: BlacklistOptions): BlacklistOptions {
+    const res = super._extend(options) as BlacklistOptions
+
+    if (options.blacklist) {
+      res.blacklist = this.blacklist.concat(options.blacklist)
+    }
+
+    return res
   }
 
 }

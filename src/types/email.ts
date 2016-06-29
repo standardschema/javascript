@@ -14,10 +14,18 @@ export class Email extends String implements EmailOptions {
     this._tests.push(isEmail)
   }
 
-  _isType (value: any) {
-    return wrapIsType(this, value, super._isType, (value) => {
-      return validator.isEmail(value) ? 1 : 0
+  _isType (value: any, path: string[], context: Context) {
+    return wrapIsType(this, value, path, context, super._isType, (value) => {
+      if (validator.isEmail(value)) {
+        return 1
+      }
+
+      throw context.error(path, 'Email', 'type', 'Email', value)
     })
+  }
+
+  _extend (options: EmailOptions): EmailOptions {
+    return super._extend(options) as EmailOptions
   }
 
 }

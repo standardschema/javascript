@@ -1,8 +1,7 @@
-import omit = require('object.omit')
 import { Any, AnyOptions } from './any'
 import { Rule } from './rule'
 import { promiseEvery } from '../support/promises'
-import { TestFn, identity, wrapIsType, mergeSchema, merge } from '../utils'
+import { TestFn, identity, wrapIsType, extendSchema, merge, Context } from '../utils'
 
 export interface IntersectionOptions extends AnyOptions {
   types: Rule[]
@@ -18,32 +17,79 @@ export class Intersection extends Any implements IntersectionOptions {
     super(options)
 
     this.types = options.types
-    this._types = squashTypes(this.types)
+    this._types = Intersection.flatten(this.types)
 
     this._tests.push(toIntersectionTest(this._types))
   }
 
-  _isType (value: any) {
-    return wrapIsType(this, value, super._isType, (value) => {
+  /**
+   * Merge multiple schemas together.
+   */
+  static flatten (schemas: Rule[]): Rule[] {
+    return schemas
+      .reduce(
+        function (result, schema) {
+          if (schema) {
+            for (let i = 0; i < result.length; i++) {
+              const cur = result[i]
+
+              if (cur._typeOf(schema)) {
+                result[i] = extendSchema(schema, cur)
+                return result
+              }
+
+              if (schema._typeOf(cur)) {
+                result[i] = extendSchema(cur, schema)
+                return result
+              }
+            }
+
+            result.push(schema)
+          }
+
+          return result
+        },
+        [] as Rule[]
+      )
+  }
+
+  /**
+   * Intersection schemas together.
+   */
+  static intersect (...schemas: Rule[]): Rule {
+    const types = Intersection.flatten(schemas)
+
+    return types.length > 1 ? new Intersection({ types }) : types[0]
+  }
+
+  _isType (value: any, path: string[], context: Context) {
+    return wrapIsType(this, value, path, context, super._isType, (value, path, context) => {
       let res = 0
 
       for (const type of this._types) {
-        const check = type._isType(value)
-
-        if (check === 0) {
-          return 0
-        }
-
-        res += check
+        res += type._isType(value, path, context)
       }
 
       return res
     })
   }
 
-  toJSON () {
-    return omit(this, ['_tests', '_types'])
+  _extend (options: any) {
+    const res = super._extend(options) as IntersectionOptions
+
+    if (options.types) {
+      res.types = this.types.concat(options.types)
+    }
+
+    return res
   }
+
+  toJSON () {
+    const json = super.toJSON()
+    json.types = this.types.map(x => x.toJSON())
+    delete json._types
+    return json
+    }
 
 }
 
@@ -68,33 +114,4 @@ function toIntersectionTest (types: Rule[]): TestFn<any> {
 
     return result.then(values => merge(...values)).then(res => next(res))
   }
-}
-
-/**
- * Optimise the shape of types.
- */
-function squashTypes (types: Rule[]): Rule[] {
-  return types
-    .reduce(
-      function (out, type) {
-        for (let i = 0; i < out.length; i++) {
-          const res = out[i]
-
-          if (res._typeOf(type)) {
-            out[i] = mergeSchema(res, type)
-            return out
-          }
-
-          if (type._typeOf(res)) {
-            out[i] = mergeSchema(type, res)
-            return out
-          }
-        }
-
-        out.push(type)
-
-        return out
-      },
-      [] as Rule[]
-    )
 }

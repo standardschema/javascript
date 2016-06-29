@@ -1,5 +1,5 @@
 import { Any, AnyOptions } from './any'
-import { TestFn, wrapIsType } from '../utils'
+import { TestFn, wrapIsType, Context } from '../utils'
 
 export interface LiteralOptions extends AnyOptions {
   value: any
@@ -18,9 +18,13 @@ export class Literal extends Any implements LiteralOptions {
     this._tests.push(toValueTest(this.value))
   }
 
-  _isType (value: any) {
-    return wrapIsType(this, value, super._isType, (value) => {
-      return value === this.value ? 1 : 0
+  _isType (value: any, path: string[], context: Context) {
+    return wrapIsType(this, value, path, context, super._isType, (value) => {
+      if (value === this.value) {
+        return 1
+      }
+
+      throw context.error(path, 'Literal', 'value', this.value, value)
     })
   }
 
