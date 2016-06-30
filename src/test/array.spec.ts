@@ -24,4 +24,23 @@ test('array', t => {
       return validate([1, 2, 3])
     })
   })
+
+  t.test('map items to new types', t => {
+    const schema = new Types.Array({
+      items: new Types.Object({
+        properties: {
+          a: new Types.String()
+        }
+      })
+    })
+
+    const validate = compile(schema)
+
+    t.test('use validated objects as result', t => {
+      return validate([{ a: 'a', b: 'b' }])
+        .then(res => {
+          t.deepEqual(res, [{ a: 'a' }])
+        })
+    })
+  })
 })

@@ -3,7 +3,7 @@ import assert = require('assert')
 import { Rule } from './rule'
 import { Any, AnyOptions } from './any'
 import { Intersection } from './intersection'
-import { Context, TestFn, NextFunction, Ref, toValue, toNext, wrapIsType } from '../utils'
+import { Context, TestFn, NextFunction, Ref, toValue, toNext, wrapIsType, identity } from '../utils'
 import { promiseEvery } from '../support/promises'
 
 export interface ArrayOptions extends AnyOptions {
@@ -77,12 +77,10 @@ function toItemTest (schema: Rule): TestFn<any[]> {
 
   return function (value, path, context, next) {
     return promiseEvery(value.map((value: any, index: number) => {
-      const next = () => value
-
       return function () {
-        return test(value, path.concat(String(index)), context, next)
+        return test(value, path.concat(String(index)), context, identity)
       }
-    })).then(() => next(value))
+    })).then(res => next(res))
   }
 }
 

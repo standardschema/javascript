@@ -19,7 +19,6 @@ export function promiseEvery <T> (fns: Array<() => Promise<T>>): Promise<T[]> {
       .then(
         function (result) {
           results[index] = result
-
           return results
         },
         function (error) {
@@ -28,6 +27,7 @@ export function promiseEvery <T> (fns: Array<() => Promise<T>>): Promise<T[]> {
           }
 
           err = error
+          return results
         }
       )
   }
