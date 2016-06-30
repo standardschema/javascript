@@ -42,7 +42,7 @@ export class Array extends Any implements ArrayOptions {
 
   _isType (value: any, path: string[], context: Context) {
     return wrapIsType(this, value, path, context, super._isType, (value) => {
-      if (!global.Array.isArray(value)) {
+      if (global.Array.isArray(value)) {
         return 1
       }
 
