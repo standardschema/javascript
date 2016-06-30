@@ -54,3 +54,14 @@ export function assert (rootSchema: Types.Rule, root: any) {
 
   return rootSchema._isType(root, [], context)
 }
+
+/**
+ * Check types are assignable.
+ */
+export function is (rootSchema: Types.Rule, root: any) {
+  try {
+    return assert(rootSchema, root)
+  } catch (err) {
+    return 0
+  }
+}
