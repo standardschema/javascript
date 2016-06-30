@@ -42,17 +42,25 @@ export class Array extends Any implements ArrayOptions {
 
   _isType (value: any, path: string[], context: Context) {
     return wrapIsType(this, value, path, context, super._isType, (value) => {
-      if (global.Array.isArray(value)) {
-        let res = 1
-
-        for (let i = 0; i < value.length; i++) {
-          res += this.items._isType(value[i], path.concat(String(i)), context)
-        }
-
-        return res
+      if (!global.Array.isArray(value)) {
+        throw context.error(path, 'Array', 'type', 'Array', value)
       }
 
-      throw context.error(path, 'Array', 'type', 'Array', value)
+      if (this.minItems != null && value.length < this.minItems) {
+        throw context.error(path, 'Object', 'minItems', this.minItems, value.length)
+      }
+
+      if (this.maxItems != null && value.length > this.maxItems) {
+        throw context.error(path, 'Object', 'maxItems', this.maxItems, value.length)
+      }
+
+      let res = 1
+
+      for (let i = 0; i < value.length; i++) {
+        res += this.items._isType(value[i], path.concat(String(i)), context)
+      }
+
+      return res
     })
   }
 

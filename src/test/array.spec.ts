@@ -11,8 +11,8 @@ test('array', t => {
     const validate = compile(schema)
 
     t.test('should type check', t => {
-      t.equal(is(schema, []), 2)
-      t.equal(is(schema, ['test']), 3)
+      t.equal(is(schema, []), 0)
+      t.equal(is(schema, ['test', 'more']), 4)
       t.equal(is(schema, 123), 0)
       t.end()
     })
