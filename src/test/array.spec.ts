@@ -1,5 +1,5 @@
 import test = require('blue-tape')
-import { Types, compile } from '../index'
+import { Types, compile, is } from '../index'
 
 test('array', t => {
   t.test('min items', t => {
@@ -9,6 +9,13 @@ test('array', t => {
     })
 
     const validate = compile(schema)
+
+    t.test('should type check', t => {
+      t.equal(is(schema, []), 2)
+      t.equal(is(schema, ['test']), 3)
+      t.equal(is(schema, 123), 0)
+      t.end()
+    })
 
     t.test('should fail with min items', t => {
       t.plan(2)

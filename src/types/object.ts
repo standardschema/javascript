@@ -59,7 +59,7 @@ export class Object extends Any implements ObjectOptions {
         throw context.error(path, 'Object', 'type', 'Object', value)
       }
 
-      let res = 0
+      let res = 1
       const keys = global.Object.keys(value)
 
       if (this.minKeys != null && keys.length < this.minKeys) {

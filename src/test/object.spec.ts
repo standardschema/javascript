@@ -39,7 +39,7 @@ test('object', t => {
     const validate = compile(schema)
 
     t.test('is structural type', t => {
-      t.equal(assert(schema, { '123': 'abc' }), 3)
+      t.equal(assert(schema, { '123': 'abc' }), 4)
       t.end()
     })
 
@@ -77,7 +77,7 @@ test('object', t => {
 
     t.test('is structural type', t => {
       t.throws(() => assert(schema, { a: 123 }))
-      t.equal(assert(schema, { a: 123, b: 456 }), 5)
+      t.equal(assert(schema, { a: 123, b: 456 }), 6)
       t.end()
     })
 

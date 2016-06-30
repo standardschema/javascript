@@ -43,7 +43,13 @@ export class Array extends Any implements ArrayOptions {
   _isType (value: any, path: string[], context: Context) {
     return wrapIsType(this, value, path, context, super._isType, (value) => {
       if (global.Array.isArray(value)) {
-        return 1
+        let res = 1
+
+        for (let i = 0; i < value.length; i++) {
+          res += this.items._isType(value[i], path.concat(String(i)), context)
+        }
+
+        return res
       }
 
       throw context.error(path, 'Array', 'type', 'Array', value)

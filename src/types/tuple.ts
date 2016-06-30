@@ -27,7 +27,13 @@ export class Tuple extends Any implements TupleOptions {
   _isType (value: any, path: string[], context: Context) {
     return wrapIsType(this, value, path, context, super._isType, (value) => {
       if (value.length === this.tuple.length) {
-        return 1
+        let res = 1
+
+        for (let i = 0; i < this.tuple.length; i++) {
+          res += this.tuple[i]._isType(value[i], path.concat(String(i)), context)
+        }
+
+        return res
       }
 
       throw context.error(path, 'Tuple', 'tuple', this.tuple.length, value)
