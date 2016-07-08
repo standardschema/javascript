@@ -38,11 +38,6 @@ test('object', t => {
 
     const validate = compile(schema)
 
-    t.test('is structural type', t => {
-      t.equal(assert(schema, { '123': 'abc' }), 4)
-      t.end()
-    })
-
     t.test('accept valid property types', t => {
       return validate({ '123': '123', '456': '456' })
         .then(function (res) {
