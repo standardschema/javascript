@@ -69,7 +69,7 @@ export function is (schema: Types.Rule, value: any) {
 /**
  * Select the best matching type from a list of schemas.
  */
-export function best (schemas: Types.Rule[], value: any): Types.Rule | void {
+export function bestSchema (schemas: Types.Rule[], value: any): Types.Rule | void {
   let type: Types.Rule
   let score = 0
 
@@ -83,4 +83,23 @@ export function best (schemas: Types.Rule[], value: any): Types.Rule | void {
   }
 
   return type
+}
+
+/**
+ * Select the best matching value from a list of schema/value tuples.
+ */
+export function bestValue (list: Array<[Types.Rule, any]>): any {
+  let result: any
+  let score = 0
+
+  for (const [schema, value] of list) {
+    const subscore = is(schema, value)
+
+    if (subscore > score) {
+      result = value
+      score = subscore
+    }
+  }
+
+  return result
 }
