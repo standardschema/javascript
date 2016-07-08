@@ -58,10 +58,29 @@ export function assert (rootSchema: Types.Rule, root: any) {
 /**
  * Check types are assignable.
  */
-export function is (rootSchema: Types.Rule, root: any) {
+export function is (schema: Types.Rule, value: any) {
   try {
-    return assert(rootSchema, root)
+    return assert(schema, value)
   } catch (err) {
     return 0
   }
+}
+
+/**
+ * Select the best matching type from a list of schemas.
+ */
+export function best (schemas: Types.Rule[], value: any): Types.Rule | void {
+  let type: Types.Rule
+  let score = 0
+
+  for (const schema of schemas) {
+    const subscore = is(schema, value)
+
+    if (subscore > score) {
+      type = schema
+      score = subscore
+    }
+  }
+
+  return type
 }
