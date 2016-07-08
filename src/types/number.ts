@@ -49,11 +49,11 @@ function isNumber (value: any, path: string[], context: Context, next: NextFunct
 }
 
 function toMinTest (min: number | Ref): TestFn<number> {
-  const minValue = toValue(min)
-
   if (min == null) {
     return toNext
   }
+
+  const minValue = toValue(min)
 
   return function (value, path, context, next) {
     const min = minValue(path, context)
@@ -67,11 +67,11 @@ function toMinTest (min: number | Ref): TestFn<number> {
 }
 
 function toMaxTest (max: number | Ref): TestFn<number> {
-  const maxValue = toValue(max)
-
   if (max == null) {
     return toNext
   }
+
+  const maxValue = toValue(max)
 
   return function (value, path, context, next) {
     const max = maxValue(path, context)

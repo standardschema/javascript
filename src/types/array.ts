@@ -99,11 +99,11 @@ function toItemTest (schema: Rule): TestFn<any[]> {
 }
 
 function toMinItemsTest (minItems: number | Ref): TestFn<any[]> {
-  const minItemsValue = toValue(minItems)
-
   if (minItems == null) {
     return toNext
   }
+
+  const minItemsValue = toValue(minItems)
 
   return function (value, path, context, next) {
     const minItems = minItemsValue(path, context)
@@ -117,11 +117,11 @@ function toMinItemsTest (minItems: number | Ref): TestFn<any[]> {
 }
 
 function toMaxItemsTest (maxItems: number | Ref): TestFn<any[]> {
-  const maxItemsValue = toValue(maxItems)
-
   if (maxItems == null) {
     return toNext
   }
+
+  const maxItemsValue = toValue(maxItems)
 
   return function (value, path, context, next) {
     const maxItems = maxItemsValue(path, context)

@@ -4,11 +4,11 @@ import { Rule } from './rule'
 import { Any, AnyOptions } from './any'
 import { Intersection } from './intersection'
 import { promiseEvery } from '../support/promises'
-import { TestFn, Context, CompiledFn, identity, NextFunction, wrapIsType, isType } from '../utils'
+import { TestFn, Context, CompiledFn, identity, NextFunction, wrapIsType, isType, Ref, toValue, toNext } from '../utils'
 
 export interface ObjectOptions extends AnyOptions {
-  minKeys?: number
-  maxKeys?: number
+  minKeys?: number | Ref
+  maxKeys?: number | Ref
   properties?: ObjectProperties
   propertyTypes?: ObjectPropertyTypes
 }
@@ -22,8 +22,8 @@ export type ObjectPropertyTypes = Array<[Rule, Rule]>
 export class Object extends Any implements ObjectOptions {
 
   type = 'Object'
-  minKeys: number
-  maxKeys: number
+  minKeys: number | Ref
+  maxKeys: number | Ref
   properties: ObjectProperties = {}
   propertyTypes: ObjectPropertyTypes = []
 
@@ -47,7 +47,9 @@ export class Object extends Any implements ObjectOptions {
     }
 
     this._tests.push(isObject)
-    this._tests.push(toPropertiesTest(this.properties, this.propertyTypes, this.minKeys, this.maxKeys))
+    this._tests.push(toPropertiesTest(this.properties, this.propertyTypes))
+    this._tests.push(toMinKeysTest(this.minKeys))
+    this._tests.push(toMaxKeysTest(this.minKeys))
   }
 
   /**
@@ -61,14 +63,6 @@ export class Object extends Any implements ObjectOptions {
 
       let res = 1
       const keys = global.Object.keys(value)
-
-      if (this.minKeys != null && keys.length < this.minKeys) {
-        throw context.error(path, 'Object', 'minKeys', this.minKeys, keys.length)
-      }
-
-      if (this.maxKeys != null && keys.length > this.maxKeys) {
-        throw context.error(path, 'Object', 'maxKeys', this.maxKeys, keys.length)
-      }
 
       // Check type against all valid keys.
       for (const key of global.Object.keys(this.properties)) {
@@ -127,12 +121,8 @@ function isObject (value: any, path: string[], context: Context, next: NextFunct
 /**
  * Test all properties in an object definition.
  */
-function toPropertiesTest (
-  properties?: ObjectProperties,
-  propertyTypes?: ObjectPropertyTypes,
-  minKeys?: number,
-  maxKeys?: number
-): TestFn<any> {
+function toPropertiesTest (properties?: ObjectProperties, propertyTypes?: ObjectPropertyTypes): TestFn<any> {
+
   const propertyTypeTests = propertyTypes
     .map<[Rule, CompiledFn<any>, CompiledFn<any>]>(function (pair) {
       const [keyType, valueType] = pair
@@ -145,20 +135,9 @@ function toPropertiesTest (
       return [key, properties[key]._compile()]
     })
 
-  const minKeyCount = minKeys == null ? 0 : minKeys
-  const maxKeyCount = maxKeys == null ? Infinity : maxKeys
-
   return function (object, path, context, next) {
     const keys = global.Object.keys(object)
     const testMap: { [key: string]: Array<(path: string[], tuple: [string, any]) => Promise<[any, any]>> } = {}
-
-    if (keys.length < minKeyCount) {
-      throw context.error(path, 'Object', 'minKeys', minKeys, keys.length)
-    }
-
-    if (keys.length > maxKeyCount) {
-      throw context.error(path, 'Object', 'maxKeys', maxKeys, keys.length)
-    }
 
     for (const [key, test] of propertyTests) {
       pushKey(testMap, key, function (path: string[], [key, value]: [string, any]) {
@@ -222,4 +201,46 @@ function pushKey <T> (obj: { [key: string]: T[] }, key: string, value: T) {
   obj[key] = obj[key] || []
   obj[key].push(value)
   return obj
+}
+
+/**
+ * Convert to a min keys check.
+ */
+function toMinKeysTest (minKeys: number | Ref | void): TestFn<any> {
+  if (minKeys == null) {
+    return toNext
+  }
+
+  const minKeysValue = toValue(minKeys)
+
+  return function (value, path, context, next) {
+    const minKeys = minKeysValue(path, context)
+
+    if (global.Object.keys(value).length < minKeys) {
+      throw context.error(path, 'Object', 'minKeys', minKeys, value)
+    }
+
+    return next(value)
+  }
+}
+
+/**
+ * Convert to a max keys check.
+ */
+function toMaxKeysTest (maxKeys: number | Ref | void): TestFn<any> {
+  if (maxKeys == null) {
+    return toNext
+  }
+
+  const maxKeysValue = toValue(maxKeys)
+
+  return function (value, path, context, next) {
+    const maxKeys = maxKeysValue(path, context)
+
+    if (global.Object.keys(value).length > maxKeys) {
+      throw context.error(path, 'Object', 'maxKeys', maxKeys, value)
+    }
+
+    return next(value)
+  }
 }

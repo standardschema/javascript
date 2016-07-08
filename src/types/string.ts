@@ -60,11 +60,11 @@ function isString <T> (value: T, path: string[], context: Context, next: NextFun
 }
 
 function toMinLengthTest (minLength: number | Ref | void): TestFn<string> {
-  const minLengthValue = toValue(minLength)
-
   if (minLength == null) {
     return toNext
   }
+
+  const minLengthValue = toValue(minLength)
 
   return function (value, path, context, next) {
     const minLength = minLengthValue(path, context)
@@ -78,11 +78,11 @@ function toMinLengthTest (minLength: number | Ref | void): TestFn<string> {
 }
 
 function toMaxLengthTest (maxLength: number | Ref | void): TestFn<string> {
-  const maxLengthValue = toValue(maxLength)
-
   if (maxLength == null) {
     return toNext
   }
+
+  const maxLengthValue = toValue(maxLength)
 
   return function (value, path, context, next) {
     const maxLength = maxLengthValue(path, context)

@@ -110,11 +110,11 @@ function toRequiredTest (required: boolean): TestFn<any> {
  * Set the default value during validation.
  */
 function toDefaultTest (defaulted: any): TestFn<any> {
-  const defaultValue = toValue(defaulted)
-
   if (defaulted == null) {
     return toNext
   }
+
+  const defaultValue = toValue(defaulted)
 
   return function (value, path, context, next) {
     return next(value == null ? defaultValue(path, context) : value)
