@@ -82,6 +82,10 @@ export function bestSchema (schemas: Types.Rule[], value: any): Types.Rule | voi
     }
   }
 
+  if (score === 0) {
+    throw new TypeError('Value does not match any schemas in set')
+  }
+
   return type
 }
 
@@ -99,6 +103,10 @@ export function bestValue (list: Array<[Types.Rule, any]>): any {
       result = value
       score = subscore
     }
+  }
+
+  if (score === 0) {
+    throw new TypeError('No matching values found in set')
   }
 
   return result
