@@ -69,7 +69,7 @@ export function is (schema: Types.Rule, value: any) {
 /**
  * Select the best matching type from a list of schemas.
  */
-export function bestSchema (schemas: Types.Rule[], value: any): Types.Rule | void {
+export function bestSchema (schemas: Types.Rule[], value: any): Types.Rule {
   let type: Types.Rule
   let score = 0
 
