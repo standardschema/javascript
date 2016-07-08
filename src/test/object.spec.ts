@@ -71,7 +71,7 @@ test('object', t => {
     const validate = compile(schema)
 
     t.test('is structural type', t => {
-      t.throws(() => assert(schema, { a: 123 }))
+      t.equal(assert(schema, { a: 123 }), 4)
       t.equal(assert(schema, { a: 123, b: 456 }), 6)
       t.end()
     })
