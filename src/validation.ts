@@ -118,13 +118,13 @@ function typeCompiler (v: Validator, visit: Visit, next: () => void) {
   if (schema['@type'] === 'String') {
     v.doIf(`typeof ${dataName} === 'string'`)
 
-    if (schema.minLength > 0) {
+    if (typeof schema.minLength === 'number' && schema.minLength > 0) {
       v.doIf(`${dataName}.length < ${schema.minLength}`)
       v.error(`min length`, dataPathName, schemaPath.concat('minLength'))
       v.doEnd()
     }
 
-    if (schema.maxLength > 0) {
+    if (typeof schema.maxLength === 'number' && schema.maxLength > 0) {
       v.doIf(`${dataName}.length > ${schema.maxLength}`)
       v.error(`max length`, dataPathName, schemaPath.concat('maxLength'))
       v.doEnd()
@@ -211,13 +211,13 @@ function typeCompiler (v: Validator, visit: Visit, next: () => void) {
 
     v.doIf(`Array.isArray(${dataName})`)
 
-    if (schema.minItems > 0) {
+    if (typeof schema.minItems === 'number' && schema.minItems > 0) {
       v.doIf(`${dataName}.length < ${schema.minItems}`)
       v.error(`min items`, dataPathName, schemaPath.concat('minItems'))
       v.doEnd()
     }
 
-    if (schema.maxItems > 0) {
+    if (typeof schema.maxItems === 'number' && schema.maxItems > 0) {
       v.doIf(`${dataName}.length > ${schema.maxItems}`)
       v.error(`max length`, dataPathName, schemaPath.concat('maxItems'))
       v.doEnd()
@@ -338,13 +338,13 @@ function typeCompiler (v: Validator, visit: Visit, next: () => void) {
     const recordName = v.var('record', '{}')
     const keysName = v.var('keys', `Object.keys(${v.dataName})`)
 
-    if (schema.minProperties > 0) {
+    if (typeof schema.minProperties === 'number' && schema.minProperties > 0) {
       v.doIf(`${keysName}.length < ${schema.minProperties}`)
       v.error(`min properties`, dataPathName, schemaPath.concat('minProperties'))
       v.doEnd()
     }
 
-    if (schema.maxProperties > 0) {
+    if (typeof schema.maxProperties === 'number' && schema.maxProperties > 0) {
       v.doIf(`${keysName}.length > ${schema.maxProperties}`)
       v.error(`max properties`, dataPathName, schemaPath.concat('maxProperties'))
       v.doEnd()
@@ -410,13 +410,13 @@ function typeCompiler (v: Validator, visit: Visit, next: () => void) {
         v.push(`var ${resolveName} = ${propsName}.then(function (keys) {`)
         v.indent++
 
-        if (property.minProperties > 0) {
+        if (typeof property.minProperties === 'number' && property.minProperties > 0) {
           v.doIf(`keys.length < ${property.minProperties}`)
           v.error(`min properties`, dataPathName, schemaPath.concat(['property', index, 'minProperties']))
           v.doEnd()
         }
 
-        if (property.maxProperties > 0) {
+        if (typeof property.maxProperties === 'number' && property.maxProperties > 0) {
           v.doIf(`keys.length > ${property.maxProperties}`)
           v.error(`max properties`, dataPathName, schemaPath.concat(['property', index, 'maxProperties']))
           v.doEnd()

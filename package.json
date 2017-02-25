@@ -54,12 +54,12 @@
   },
   "devDependencies": {
     "istanbul": "^0.4.3",
-    "jest": "^18.1.0",
+    "jest": "^19.0.2",
     "rimraf": "^2.5.4",
-    "ts-jest": "^18.0.3",
+    "ts-jest": "^19.0.0",
     "tslint": "^4.4.2",
     "tslint-config-standard": "^4.0.0",
-    "typescript": "^2.1.6",
+    "typescript": "~2.2.1",
     "typings": "^2.1.0"
   },
   "dependencies": {
