@@ -41,11 +41,11 @@ validate({ username: 'hello' }).then(...)
 
 Apache 2.0
 
-[npm-image]: https://img.shields.io/npm/v/jaywalk.svg?style=flat
-[npm-url]: https://npmjs.org/package/jaywalk
-[downloads-image]: https://img.shields.io/npm/dm/jaywalk.svg?style=flat
-[downloads-url]: https://npmjs.org/package/jaywalk
-[travis-image]: https://img.shields.io/travis/blakeembrey/jaywalk.svg?style=flat
-[travis-url]: https://travis-ci.org/blakeembrey/jaywalk
-[coveralls-image]: https://img.shields.io/coveralls/blakeembrey/jaywalk.svg?style=flat
-[coveralls-url]: https://coveralls.io/r/blakeembrey/jaywalk?branch=master
+[npm-image]: https://img.shields.io/npm/v/standard-schema.svg?style=flat
+[npm-url]: https://npmjs.org/package/standard-schema
+[downloads-image]: https://img.shields.io/npm/dm/standard-schema.svg?style=flat
+[downloads-url]: https://npmjs.org/package/standard-schema
+[travis-image]: https://img.shields.io/travis/standard-schema/javascript.svg?style=flat
+[travis-url]: https://travis-ci.org/standard-schema/javascript
+[coveralls-image]: https://img.shields.io/coveralls/standard-schema/javascript.svg?style=flat
+[coveralls-url]: https://coveralls.io/r/standard-schema/javascript?branch=master
