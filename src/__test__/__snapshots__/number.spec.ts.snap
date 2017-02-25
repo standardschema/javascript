@@ -1,0 +1,11 @@
+exports[`Number should reject non-numbers 1`] = `
+Array [
+  Object {
+    "dataPath": Array [],
+    "message": "not a number",
+    "schemaPath": Array [
+      "@type",
+    ],
+  },
+]
+`;

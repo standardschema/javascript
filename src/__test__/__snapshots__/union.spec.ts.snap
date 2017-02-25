@@ -1,0 +1,22 @@
+exports[`Union should reject invalid unions 1`] = `
+Array [
+  Object {
+    "dataPath": Array [],
+    "message": "not a string",
+    "schemaPath": Array [
+      "type",
+      0,
+      "@type",
+    ],
+  },
+  Object {
+    "dataPath": Array [],
+    "message": "not a number",
+    "schemaPath": Array [
+      "type",
+      1,
+      "@type",
+    ],
+  },
+]
+`;

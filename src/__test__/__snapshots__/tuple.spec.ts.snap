@@ -1,0 +1,38 @@
+exports[`Tuple should reject incorrect tuples 1`] = `
+Array [
+  Object {
+    "dataPath": Array [
+      0,
+    ],
+    "message": "not a string",
+    "schemaPath": Array [
+      "tuple",
+      0,
+      "@type",
+    ],
+  },
+  Object {
+    "dataPath": Array [
+      1,
+    ],
+    "message": "not a boolean",
+    "schemaPath": Array [
+      "tuple",
+      1,
+      "@type",
+    ],
+  },
+]
+`;
+
+exports[`Tuple should reject non-tuples 1`] = `
+Array [
+  Object {
+    "dataPath": Array [],
+    "message": "not a tuple",
+    "schemaPath": Array [
+      "@type",
+    ],
+  },
+]
+`;

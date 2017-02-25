@@ -1,0 +1,13 @@
+exports[`Intersection should reject invalid intersection values 1`] = `
+Array [
+  Object {
+    "dataPath": Array [],
+    "message": "min length",
+    "schemaPath": Array [
+      "type",
+      0,
+      "minLength",
+    ],
+  },
+]
+`;

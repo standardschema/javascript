@@ -1,0 +1,35 @@
+exports[`DateTime should be possible to specify max date 1`] = `
+Array [
+  Object {
+    "dataPath": Array [],
+    "message": "max date",
+    "schemaPath": Array [
+      "max",
+    ],
+  },
+]
+`;
+
+exports[`DateTime should be possible to specify min date 1`] = `
+Array [
+  Object {
+    "dataPath": Array [],
+    "message": "min date",
+    "schemaPath": Array [
+      "min",
+    ],
+  },
+]
+`;
+
+exports[`DateTime should reject non-date times 1`] = `
+Array [
+  Object {
+    "dataPath": Array [],
+    "message": "not a date",
+    "schemaPath": Array [
+      "@type",
+    ],
+  },
+]
+`;

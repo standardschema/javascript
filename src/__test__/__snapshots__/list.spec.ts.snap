@@ -1,0 +1,34 @@
+exports[`List should reject non-lists 1`] = `
+Array [
+  Object {
+    "dataPath": Array [
+      0,
+    ],
+    "message": "not a string",
+    "schemaPath": Array [
+      "items",
+      "@type",
+    ],
+  },
+  Object {
+    "dataPath": Array [
+      1,
+    ],
+    "message": "not a string",
+    "schemaPath": Array [
+      "items",
+      "@type",
+    ],
+  },
+  Object {
+    "dataPath": Array [
+      2,
+    ],
+    "message": "not a string",
+    "schemaPath": Array [
+      "items",
+      "@type",
+    ],
+  },
+]
+`;

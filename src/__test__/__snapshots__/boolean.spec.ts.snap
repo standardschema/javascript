@@ -1,0 +1,11 @@
+exports[`Boolean should reject non-booleans 1`] = `
+Array [
+  Object {
+    "dataPath": Array [],
+    "message": "not a boolean",
+    "schemaPath": Array [
+      "@type",
+    ],
+  },
+]
+`;

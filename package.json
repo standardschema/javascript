@@ -1,17 +1,20 @@
 {
-  "name": "jaywalk",
+  "name": "standard-schema",
   "version": "0.10.8",
   "description": "Runtime type validation",
   "main": "dist/index.js",
   "files": [
     "dist/"
   ],
+  "bin": {
+    "standard-schema": "dist/bin/index"
+  },
   "scripts": {
-    "lint": "tslint \"src/**/*.ts\" -e \"src/typings/**\"",
-    "build": "rm -rf dist && tsc",
-    "test-spec": "blue-tape \"dist/**/*.spec.js\"",
-    "test-cov": "istanbul cover --print none node_modules/blue-tape/bin/blue-tape.js -- \"dist/**/*.spec.js\" | tap-spec",
-    "test": "npm run lint && npm run build && npm run test-cov",
+    "lint": "tslint \"src/**/*.ts\"",
+    "build": "rimraf dist && tsc",
+    "test:watch": "jest --watch",
+    "test:spec": "jest --coverage",
+    "test": "npm run -s lint && npm run -s build && npm run -s test:spec",
     "prepublish": "typings install && npm run build"
   },
   "repository": {
@@ -20,6 +23,8 @@
   },
   "keywords": [
     "schema",
+    "standard",
+    "data",
     "json",
     "validation",
     "types",
@@ -36,19 +41,29 @@
     "url": "https://github.com/blakeembrey/jaywalk/issues"
   },
   "homepage": "https://github.com/blakeembrey/jaywalk",
+  "jest": {
+    "transform": {
+      ".(ts|tsx)": "ts-jest/preprocessor.js"
+    },
+    "testRegex": "src/.*\\.(?:test|spec)\\.(ts|tsx|js)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js"
+    ]
+  },
   "devDependencies": {
-    "blue-tape": "^1.0.0",
     "istanbul": "^0.4.3",
-    "tap-spec": "^4.1.1",
-    "tslint": "^4.0.0",
-    "tslint-config-standard": "^1.2.2",
-    "typescript": "^2.0.6",
-    "typings": "^2.0.0"
+    "jest": "^18.1.0",
+    "rimraf": "^2.5.4",
+    "ts-jest": "^18.0.3",
+    "tslint": "^4.4.2",
+    "tslint-config-standard": "^4.0.0",
+    "typescript": "^2.1.6",
+    "typings": "^2.1.0"
   },
   "dependencies": {
-    "any-promise": "^1.3.0",
-    "make-error-cause": "^1.1.0",
-    "validator": "^6.1.0",
-    "xtend": "^4.0.1"
+    "arrify": "^1.0.1",
+    "jsonld": "^0.4.11"
   }
 }

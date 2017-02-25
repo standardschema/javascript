@@ -1,0 +1,11 @@
+exports[`Null should reject non-nulls 1`] = `
+Array [
+  Object {
+    "dataPath": Array [],
+    "message": "not null",
+    "schemaPath": Array [
+      "@type",
+    ],
+  },
+]
+`;

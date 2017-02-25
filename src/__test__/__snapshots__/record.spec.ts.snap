@@ -1,0 +1,29 @@
+exports[`Record should reject invalid dynamic keys 1`] = `
+Array [
+  Object {
+    "dataPath": Array [],
+    "message": "min properties",
+    "schemaPath": Array [
+      "property",
+      0,
+      "minProperties",
+    ],
+  },
+]
+`;
+
+exports[`Record should reject records with missing properties 1`] = `
+Array [
+  Object {
+    "dataPath": Array [
+      "b",
+    ],
+    "message": "required",
+    "schemaPath": Array [
+      "property",
+      1,
+      "required",
+    ],
+  },
+]
+`;

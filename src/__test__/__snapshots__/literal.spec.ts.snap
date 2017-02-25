@@ -1,0 +1,11 @@
+exports[`Literal should reject non-literals 1`] = `
+Array [
+  Object {
+    "dataPath": Array [],
+    "message": "not a literal",
+    "schemaPath": Array [
+      "@type",
+    ],
+  },
+]
+`;

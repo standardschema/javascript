@@ -1,0 +1,13 @@
+exports[`#use should reject invalid use schemas 1`] = `
+Array [
+  Object {
+    "dataPath": Array [],
+    "message": "min length",
+    "schemaPath": Array [
+      "use",
+      0,
+      "minLength",
+    ],
+  },
+]
+`;

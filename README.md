@@ -1,30 +1,38 @@
-# Jaywalk
+# Standard Schema
 
 [![NPM version][npm-image]][npm-url]
 [![NPM downloads][downloads-image]][downloads-url]
 [![Build status][travis-image]][travis-url]
 [![Test coverage][coveralls-image]][coveralls-url]
 
-> Runtime type validations.
+> Runtime type validation.
 
 ## Installation
 
 ```sh
-npm install jaywalk --save
+npm install standard-schema --save
 ```
 
 ## Usage
 
 ```ts
-import { Types, compile } from 'jaywalk'
+import { validationFunction } from 'standard-schema'
 
-const schema = new Types.Object({
-  properties: {
-    username: new Types.String({ minLength: 1, maxLength: 30, pattern: '^[A-Za-z0-9_]+$' })
-  }
+const validate = validationFunction({
+  '@type': 'Record',
+  property: [
+    {
+      '@type': 'Property',
+      key: 'username',
+      type: {
+        '@type': 'String',
+        minLength: 1,
+        maxLength: 30,
+        pattern: '^[A-Za-z0-9_]+$'
+      }
+    }
+  ]
 })
-
-const validate = compile(schema)
 
 validate({ username: 'hello' }).then(...)
 ```

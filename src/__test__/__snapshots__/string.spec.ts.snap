@@ -1,0 +1,11 @@
+exports[`String should reject non-strings 1`] = `
+Array [
+  Object {
+    "dataPath": Array [],
+    "message": "not a string",
+    "schemaPath": Array [
+      "@type",
+    ],
+  },
+]
+`;
