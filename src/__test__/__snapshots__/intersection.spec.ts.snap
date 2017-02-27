@@ -1,3 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
 exports[`Intersection should reject invalid intersection values 1`] = `
 Array [
   Object {
