@@ -5,47 +5,42 @@
 [![Build status][travis-image]][travis-url]
 [![Test coverage][coveralls-image]][coveralls-url]
 
-> Runtime type validation.
+> **Standard schema** is a vocabulary for validating data.
 
 ## Installation
 
 ```sh
-npm install standard-schema --save
+npm install standardschema --save
 ```
 
 ## Usage
 
 ```ts
-import { validationFunction } from 'standard-schema'
+import { fromJSON, AnyType, IntegerType, StringType, ... } from 'standardschema'
 
-const validate = validationFunction({
-  '@type': 'Record',
-  property: [
+const model = fromJSON({
+  '@type': 'Object',
+  'properties': [
     {
       '@type': 'Property',
-      key: 'username',
-      type: {
-        '@type': 'String',
-        minLength: 1,
-        maxLength: 30,
-        pattern: '^[A-Za-z0-9_]+$'
-      }
+      'key': 'foo',
+      'value': { '@type': 'String' }
     }
   ]
 })
 
-validate({ username: 'hello' }).then(...)
+model.isAssignable(new IntegerType()) //=> false
 ```
 
 ## License
 
 Apache 2.0
 
-[npm-image]: https://img.shields.io/npm/v/standard-schema.svg?style=flat
-[npm-url]: https://npmjs.org/package/standard-schema
-[downloads-image]: https://img.shields.io/npm/dm/standard-schema.svg?style=flat
-[downloads-url]: https://npmjs.org/package/standard-schema
-[travis-image]: https://img.shields.io/travis/standard-schema/javascript.svg?style=flat
-[travis-url]: https://travis-ci.org/standard-schema/javascript
-[coveralls-image]: https://img.shields.io/coveralls/standard-schema/javascript.svg?style=flat
-[coveralls-url]: https://coveralls.io/r/standard-schema/javascript?branch=master
+[npm-image]: https://img.shields.io/npm/v/standardschema.svg?style=flat
+[npm-url]: https://npmjs.org/package/standardschema
+[downloads-image]: https://img.shields.io/npm/dm/standardschema.svg?style=flat
+[downloads-url]: https://npmjs.org/package/standardschema
+[travis-image]: https://img.shields.io/travis/standardschema/javascript.svg?style=flat
+[travis-url]: https://travis-ci.org/standardschema/javascript
+[coveralls-image]: https://img.shields.io/coveralls/standardschema/javascript.svg?style=flat
+[coveralls-url]: https://coveralls.io/r/standardschema/javascript?branch=master
