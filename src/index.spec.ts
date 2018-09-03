@@ -2,8 +2,6 @@ import {
   AnyType,
   StringType,
   IntegerType,
-  ObjectType,
-  ListType,
   fromJSON,
   FloatType
 } from './index'

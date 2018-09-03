@@ -1,4 +1,4 @@
-import { prop } from 'functools'
+import { prop, invoke } from 'functools'
 import { zip, map } from 'iterative'
 
 export class AnyType {
@@ -8,6 +8,10 @@ export class AnyType {
 
   getProperty(key: string) {
     return new UnknownType()
+  }
+
+  toJSON () {
+    return { '@type': 'Any' }
   }
 
   static fromJSON(data: any) {
@@ -20,6 +24,10 @@ export class UnknownType extends AnyType {
     return other instanceof UnknownType
   }
 
+  toJSON () {
+    return { '@type': 'Unknown' }
+  }
+
   static fromJSON(data: any) {
     return new UnknownType()
   }
@@ -28,6 +36,10 @@ export class UnknownType extends AnyType {
 export class NullType extends AnyType {
   isAssignable(other: AnyType): other is NullType {
     return other instanceof NullType
+  }
+
+  toJSON () {
+    return { '@type': 'Null' }
   }
 
   static fromJSON(data: any) {
@@ -40,6 +52,10 @@ export class BooleanType extends AnyType {
     return other instanceof BooleanType
   }
 
+  toJSON () {
+    return { '@type': 'Boolean' }
+  }
+
   static fromJSON(data: any) {
     return new BooleanType()
   }
@@ -48,6 +64,10 @@ export class BooleanType extends AnyType {
 export class StringType extends AnyType {
   isAssignable(other: AnyType): other is StringType {
     return other instanceof StringType
+  }
+
+  toJSON () {
+    return { '@type': 'String' }
   }
 
   static fromJSON(data: any) {
@@ -60,6 +80,10 @@ export class NumberType extends AnyType {
     return other instanceof NumberType
   }
 
+  toJSON () {
+    return { '@type': 'Number' }
+  }
+
   static fromJSON(data: any) {
     return new NumberType()
   }
@@ -70,6 +94,10 @@ export class IntegerType extends NumberType {
     return other instanceof IntegerType
   }
 
+  toJSON () {
+    return { '@type': 'Integer' }
+  }
+
   static fromJSON(data: any) {
     return new IntegerType()
   }
@@ -78,6 +106,10 @@ export class IntegerType extends NumberType {
 export class FloatType extends NumberType {
   isAssignable(other: AnyType): other is FloatType {
     return other instanceof FloatType
+  }
+
+  toJSON () {
+    return { '@type': 'Float' }
   }
 
   static fromJSON(data: any) {
@@ -100,6 +132,10 @@ export class ListType<T extends AnyType> extends AnyType {
     return this.items // TODO: Enable out-of-bounds indexes with min/max items.
   }
 
+  toJSON () {
+    return { '@type': 'List', items: this.items.toJSON() }
+  }
+
   static fromJSON(data: any) {
     return new ListType(fromJSON(data.items))
   }
@@ -115,6 +151,15 @@ export class PropertyType<V extends AnyType> extends UnknownType {
     if (this.key !== other.key) return false
     if (this.required && !other.required) return false
     return this.value.isAssignable(other.value)
+  }
+
+  toJSON () {
+    return {
+      '@type': 'Property',
+      key: this.key,
+      value: this.value.toJSON(),
+      required: this.required
+    }
   }
 
   static fromJSON(data: any) {
@@ -161,6 +206,13 @@ export class ObjectType extends AnyType {
     return super.getProperty(key)
   }
 
+  toJSON() {
+    return {
+      '@type': 'Object',
+      properties: Array.from(map(this.properties.values(), invoke('toJSON')))
+    }
+  }
+
   static fromJSON(data: any) {
     return new ObjectType(data.properties.map(fromJSON))
   }
@@ -171,6 +223,10 @@ export class DateType extends AnyType {
     return other instanceof DateType
   }
 
+  toJSON() {
+    return { '@type': 'Date' }
+  }
+
   static fromJSON(data: any) {
     return new DateType()
   }
@@ -179,6 +235,10 @@ export class DateType extends AnyType {
 export class DateTimeType extends DateType {
   isAssignable(other: AnyType): other is DateTimeType {
     return other instanceof DateTimeType
+  }
+
+  toJSON() {
+    return { '@type': 'DateTime' }
   }
 
   static fromJSON(data: any) {
