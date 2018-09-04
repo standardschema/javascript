@@ -137,7 +137,7 @@ export class ListType<T extends AnyType> extends AnyType {
   }
 
   static fromJSON(data: any) {
-    return new ListType(fromJSON(data.items))
+    return new ListType(schemaFromJSON(data.items))
   }
 }
 
@@ -165,7 +165,7 @@ export class PropertyType<V extends AnyType> extends UnknownType {
   static fromJSON(data: any) {
     return new PropertyType(
       String(data.key),
-      fromJSON(data.value),
+      schemaFromJSON(data.value),
       !!data.required
     )
   }
@@ -214,7 +214,7 @@ export class ObjectType extends AnyType {
   }
 
   static fromJSON(data: any) {
-    return new ObjectType(data.properties.map(fromJSON))
+    return new ObjectType(data.properties.map(schemaFromJSON))
   }
 }
 
@@ -265,7 +265,7 @@ export const NATIVE_TYPES = {
 /**
  * Generic the model from a JSON object.
  */
-export function fromJSON(obj: any): AnyType {
+export function schemaFromJSON(obj: any): AnyType {
   if (!Array.isArray(obj)) {
     const type: keyof typeof NATIVE_TYPES = obj['@type']
 

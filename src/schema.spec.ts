@@ -2,13 +2,13 @@ import {
   AnyType,
   StringType,
   IntegerType,
-  fromJSON,
+  schemaFromJSON,
   FloatType
-} from './index'
+} from './schema'
 
-describe('fromJSON', () => {
+describe('schemaFromJSON', () => {
   it('should transform JSON to object model', () => {
-    const type = fromJSON({ '@type': 'Any' })
+    const type = schemaFromJSON({ '@type': 'Any' })
 
     expect(type).toBeInstanceOf(AnyType)
   })
@@ -16,7 +16,7 @@ describe('fromJSON', () => {
 
 describe('AnyType', () => {
   it('should create `Any` type', () => {
-    const type = fromJSON({ '@type': 'Any' })
+    const type = schemaFromJSON({ '@type': 'Any' })
 
     expect(type).toBeInstanceOf(AnyType)
     expect(type.isAssignable(new IntegerType())).toEqual(true)
@@ -26,7 +26,7 @@ describe('AnyType', () => {
 
 describe('IntegerType', () => {
   it('should create `Integer` type', () => {
-    const type = fromJSON({ '@type': 'Integer' })
+    const type = schemaFromJSON({ '@type': 'Integer' })
 
     expect(type).toBeInstanceOf(IntegerType)
     expect(type.isAssignable(new StringType())).toEqual(false)
@@ -36,8 +36,8 @@ describe('IntegerType', () => {
 
 describe('ListType', () => {
   it('should create `List` type', () => {
-    const typeWithAny = fromJSON({ '@type': 'List', items: { '@type': 'Any' } })
-    const typeWithString = fromJSON({
+    const typeWithAny = schemaFromJSON({ '@type': 'List', items: { '@type': 'Any' } })
+    const typeWithString = schemaFromJSON({
       '@type': 'List',
       items: { '@type': 'String' }
     })
@@ -53,7 +53,7 @@ describe('ListType', () => {
 
 describe('ObjectType', () => {
   it('should create `Object` type', () => {
-    const type = fromJSON({
+    const type = schemaFromJSON({
       '@type': 'Object',
       properties: [
         {
@@ -64,7 +64,7 @@ describe('ObjectType', () => {
       ]
     })
 
-    const typeWithRequired = fromJSON({
+    const typeWithRequired = schemaFromJSON({
       '@type': 'Object',
       properties: [
         {
@@ -76,7 +76,7 @@ describe('ObjectType', () => {
       ]
     })
 
-    const typeWithMismatch = fromJSON({
+    const typeWithMismatch = schemaFromJSON({
       '@type': 'Object',
       properties: [
         {
