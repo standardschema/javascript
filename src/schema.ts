@@ -100,21 +100,16 @@ export class ListType<T extends AnyType> extends AnyType {
   isAssignable(other: AnyType): other is ListType<T> {
     if (!(other instanceof ListType)) return false
 
-    if (this.items) {
-      if (!other.items) return false
-      return this.items.isAssignable(other.items)
-    }
-
-    return true
+    return this.items.isAssignable(other.items)
   }
 
   getProperty(key: string) {
     // TODO(blakeembrey): Enable out-of-bounds indexes with min/max items.
-    return this.items || new AnyType()
+    return this.items
   }
 
   static fromJSON(data: any) {
-    return new ListType(schemaFromJSON(data.items))
+    return new ListType(schemaFromJSON(data.items || { '@type': 'Any' }))
   }
 }
 
