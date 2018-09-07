@@ -619,7 +619,7 @@ export class ConcatTransform extends IdentityTransform {
 }
 
 export class DedupeTransform extends IdentityTransform {
-  static inputSchema = schemaFromJSON({ '@type': 'Array' })
+  static inputSchema = schemaFromJSON({ '@type': 'List' })
 
   transformType(input: ListType<AnyType>) {
     return input
