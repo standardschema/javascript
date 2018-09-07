@@ -1,6 +1,6 @@
 {
   "name": "standardschema",
-  "version": "0.11.3",
+  "version": "0.11.4",
   "description": "Library for validating data with Standard Schema",
   "main": "dist/index.js",
   "files": [
