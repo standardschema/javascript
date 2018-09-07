@@ -82,6 +82,16 @@ export class FloatType extends NumberType {
   }
 }
 
+export class DecimalType extends NumberType {
+  isAssignable(other: AnyType): other is DecimalType {
+    return other instanceof DecimalType
+  }
+
+  static fromJSON(data: any) {
+    return new DecimalType()
+  }
+}
+
 export class ListType<T extends AnyType> extends AnyType {
   constructor(public items: T) {
     super()
@@ -201,6 +211,7 @@ export const TYPES = {
   Number: NumberType,
   Integer: IntegerType,
   Float: FloatType,
+  Decimal: DecimalType,
   List: ListType,
   Object: ObjectType,
   Date: DateType,

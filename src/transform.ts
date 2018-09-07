@@ -11,7 +11,8 @@ import {
   FloatType,
   ListType,
   DateType,
-  DateTimeType
+  DateTimeType,
+  DecimalType
 } from './schema'
 
 function createDate(time: number) {
@@ -222,6 +223,7 @@ export class CoerceTransform extends IdentityTransform {
     if (this.type === 'Number') return new NumberType()
     if (this.type === 'Integer') return new IntegerType()
     if (this.type === 'Float') return new FloatType()
+    if (this.type === 'Decimal') return new DecimalType()
     if (this.type === 'List') return new ListType(new AnyType())
     if (this.type === 'Object') return new ObjectType(new Map(), new Map())
     if (this.type === 'Date') return new DateType()
@@ -251,14 +253,17 @@ export class CoerceTransform extends IdentityTransform {
     if (
       this.type === 'Number' ||
       this.type === 'Integer' ||
-      this.type === 'Float'
+      this.type === 'Float' ||
+      this.type === 'Decimal'
     ) {
-      if (this.type === 'Integer') {
-        if (input instanceof Date) return ~~(input.getTime() / 1000)
-        if (typeof input === 'string') return ~~Number(input)
-      } else {
-        if (input instanceof Date) return input.getTime() / 1000
-        if (typeof input === 'string') return Number(input) || 0
+      if (input instanceof Date) {
+        if (this.type === 'Integer') return ~~(input.getTime() / 1000)
+        return input.getTime() / 1000
+      }
+
+      if (typeof input === 'string') {
+        if (this.type === 'Integer') return ~~Number(input)
+        return Number(input) || 0
       }
 
       if (typeof input === 'number') return input
