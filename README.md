@@ -16,9 +16,9 @@ npm install standardschema --save
 ## Usage
 
 ```ts
-import { fromJSON } from 'standardschema'
+import { schemaFromJSON } from 'standardschema'
 
-const model = fromJSON({
+const schema = schemaFromJSON({
   '@type': 'Object',
   'properties': [
     {
@@ -29,7 +29,7 @@ const model = fromJSON({
   ]
 })
 
-model.isAssignable(fromJSON({ '@type': 'Integer' })) //=> false
+schema.isAssignable(schemaFromJSON({ '@type': 'Integer' })) //=> false
 ```
 
 ## License
