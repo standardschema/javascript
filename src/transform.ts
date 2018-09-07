@@ -530,9 +530,9 @@ export class IfTransform extends IdentityTransform {
   static inputSchema = schemaFromJSON({ '@type': 'Any' })
 
   constructor(
-    public condition: AnyTransform,
-    public then: AnyTransform,
-    public _else: AnyTransform,
+    public condition: IdentityTransform,
+    public then: IdentityTransform,
+    public _else: IdentityTransform,
     description: string,
     comment: string
   ) {
