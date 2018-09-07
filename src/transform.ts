@@ -151,13 +151,15 @@ export class ObjectTransform extends IdentityTransform {
 
   transformType(input: AnyType) {
     return new ObjectType(
-      Object.entries(this.properties).reduce<Record<string, AnyType>>(
-        (obj, [key, transform]) => {
-          obj[key] = transform.transformType(input)
-          return obj
-        },
-        {}
-      )
+      new Map(
+        Object.entries(this.properties).map(
+          ([key, transform]): [string, AnyType] => [
+            key,
+            transform.transformType(input)
+          ]
+        )
+      ),
+      new Map()
     )
   }
 
@@ -220,8 +222,8 @@ export class CoerceTransform extends IdentityTransform {
     if (this.type === 'Number') return new NumberType()
     if (this.type === 'Integer') return new IntegerType()
     if (this.type === 'Float') return new FloatType()
-    if (this.type === 'List') return new ListType()
-    if (this.type === 'Object') return new ObjectType()
+    if (this.type === 'List') return new ListType(new AnyType())
+    if (this.type === 'Object') return new ObjectType(new Map(), new Map())
     if (this.type === 'Date') return new DateType()
     if (this.type === 'DateTime') return new DateTimeType()
 

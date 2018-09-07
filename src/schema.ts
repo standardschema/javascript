@@ -83,7 +83,7 @@ export class FloatType extends NumberType {
 }
 
 export class ListType<T extends AnyType> extends AnyType {
-  constructor(public items?: T) {
+  constructor(public items: T) {
     super()
   }
 
@@ -109,45 +109,66 @@ export class ListType<T extends AnyType> extends AnyType {
 }
 
 export class ObjectType extends AnyType {
-  constructor(public properties?: Record<string, AnyType>) {
+  constructor(
+    public properties: Map<string, AnyType>,
+    public optionalProperties: Map<string, AnyType>
+  ) {
     super()
   }
 
   isAssignable(other: AnyType): other is ObjectType {
     if (!(other instanceof ObjectType)) return false
 
-    if (this.properties) {
-      if (!other.properties) return false
+    for (const [key, type] of this.properties.entries()) {
+      const otherType = other.properties.get(key)
 
-      for (const [key, type] of Object.entries(this.properties)) {
-        // Handle missing `other` property.
-        if (!other.properties.hasOwnProperty(key)) return false
+      // Handle missing `other` property.
+      if (!otherType) return false
 
-        // Check assignability between `properties`.
-        if (!type.isAssignable(other.properties[key])) return false
+      // Check assignability between `properties`.
+      if (!type.isAssignable(otherType)) return false
+    }
+
+    for (const [key, type] of this.optionalProperties.entries()) {
+      const otherType = other.optionalProperties.get(key)
+
+      if (!otherType) continue
+
+      if (other.properties.has(key)) {
+        if (!type.isAssignable(other.properties.get(key)!)) return false
       }
+
+      if (!type.isAssignable(otherType)) return false
     }
 
     return true
   }
 
   getProperty(key: string): AnyType | UnknownType {
-    if (this.properties && this.properties.hasOwnProperty(key)) {
-      return this.properties[key]
+    if (this.properties.has(key)) return this.properties.get(key)!
+
+    if (this.optionalProperties.has(key)) {
+      // TODO(blakeembrey): Union with `Null`.
+      return this.optionalProperties.get(key)!
     }
 
-    return new AnyType()
+    return super.getProperty(key)
   }
 
   static fromJSON(data: any) {
-    const properties = Object.entries(data.properties || {}).reduce<
-      Record<string, AnyType>
-    >((obj, [key, value]) => {
-      obj[key] = schemaFromJSON(value)
-      return obj
-    }, {})
+    const properties = new Map(
+      Object.entries(data.properties || {}).map(
+        ([key, value]): [string, AnyType] => [key, schemaFromJSON(value)]
+      )
+    )
 
-    return new ObjectType(properties)
+    const optionalProperties = new Map(
+      Object.entries(data.optionalProperties || {}).map(
+        ([key, value]): [string, AnyType] => [key, schemaFromJSON(value)]
+      )
+    )
+
+    return new ObjectType(properties, optionalProperties)
   }
 }
 
@@ -199,9 +220,8 @@ export interface TypeSchema {
   // `List`.
   items?: TypeSchema[]
   // `Object`.
-  properties?: {
-    [key: string]: TypeSchema
-  }
+  properties?: { [key: string]: TypeSchema }
+  optionalProperties?: { [key: string]: TypeSchema }
 }
 
 /**
