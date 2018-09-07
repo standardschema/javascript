@@ -75,7 +75,7 @@ export class ComposeTransform extends IdentityTransform {
 }
 
 export class SelectTransform extends IdentityTransform {
-  static inputSchema = schemaFromJSON({ '@type': 'Any' })
+  static inputSchema = schemaFromJSON({ '@type': 'Object' })
 
   constructor(public key: string, description: string, comment: string) {
     super(description, comment)
