@@ -654,7 +654,8 @@ export const TRANSFORMS = {
   Object: ObjectTransform,
   Or: OrTransform,
   Select: SelectTransform,
-  SizeOf: SizeOfTransform
+  SizeOf: SizeOfTransform,
+  Unknown: UnknownTransform
 }
 
 export type Transform = keyof typeof TRANSFORMS
