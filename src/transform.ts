@@ -245,7 +245,6 @@ export class CoerceTransform extends IdentityTransform {
       if (typeof input === 'string') return input
       if (input instanceof Date) return input.toISOString()
       if (typeof input === 'number') return String(input)
-      if (typeof input === 'number') return String(input)
 
       return ''
     }
@@ -306,7 +305,7 @@ export class CoerceTransform extends IdentityTransform {
         return new Date(input.getFullYear(), input.getMonth(), input.getDate())
       }
 
-      return new Date()
+      return new Date(0)
     }
 
     if (this.type === 'DateTime') {
@@ -314,7 +313,7 @@ export class CoerceTransform extends IdentityTransform {
       if (typeof input === 'number') return new Date(input * 1000)
       if (input instanceof Date) return new Date(input.getTime())
 
-      return new Date()
+      return new Date(0)
     }
 
     return null
