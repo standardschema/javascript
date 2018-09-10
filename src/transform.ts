@@ -552,8 +552,8 @@ export class IfTransform extends IdentityTransform {
   static fromJSON(data: any) {
     return new IfTransform(
       transformFromJSON(data.condition),
-      transformFromJSON(data.then),
-      transformFromJSON(data.else),
+      transformFromJSON(data.then || { '@type': 'Identity' }),
+      transformFromJSON(data.else || { '@type': 'Identity' }),
       data.description,
       data.comment
     )
