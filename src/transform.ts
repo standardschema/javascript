@@ -395,7 +395,7 @@ export class ForEachTransform extends IdentityTransform {
   }
 
   static fromJSON(data: any) {
-    return new ForEachTransform(data.transform, data.description, data.comment)
+    return new ForEachTransform(transformFromJSON(data.transform), data.description, data.comment)
   }
 }
 
@@ -419,7 +419,7 @@ export class FilterTransform extends IdentityTransform {
   }
 
   static fromJSON(data: any) {
-    return new FilterTransform(data.condition, data.description, data.comment)
+    return new FilterTransform(transformFromJSON(data.condition), data.description, data.comment)
   }
 }
 
@@ -443,7 +443,7 @@ export class AnyTransform extends IdentityTransform {
   }
 
   static fromJSON(data: any) {
-    return new AnyTransform(data.condition, data.description, data.comment)
+    return new AnyTransform(transformFromJSON(data.condition), data.description, data.comment)
   }
 }
 
@@ -551,9 +551,9 @@ export class IfTransform extends IdentityTransform {
 
   static fromJSON(data: any) {
     return new IfTransform(
-      data.condition,
-      data.then,
-      data.else,
+      transformFromJSON(data.condition),
+      transformFromJSON(data.then),
+      transformFromJSON(data.else),
       data.description,
       data.comment
     )
@@ -613,7 +613,9 @@ export class ConcatTransform extends IdentityTransform {
   }
 
   static fromJSON(data: any) {
-    return new ConcatTransform(data.selects, data.description, data.comment)
+    const selects = data.selects.map(transformFromJSON)
+
+    return new ConcatTransform(selects, data.description, data.comment)
   }
 }
 
