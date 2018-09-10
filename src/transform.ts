@@ -43,7 +43,7 @@ export class IdentityTransform {
 }
 
 export class ComposeTransform extends IdentityTransform {
-  static input = schemaFromJSON({ '@type': 'Any' })
+  static inputSchema = schemaFromJSON({ '@type': 'Any' })
 
   constructor(
     public transforms: IdentityTransform[],
