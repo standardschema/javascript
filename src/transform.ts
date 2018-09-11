@@ -609,7 +609,7 @@ export class ConcatTransform extends IdentityTransform {
   }
 
   transformData(input: any) {
-    return [].concat(...this.selects.map(select => select.transformData(input)))
+    return [].concat(...this.selects.map(select => select.transformData(input) || []))
   }
 
   static fromJSON(data: any) {
