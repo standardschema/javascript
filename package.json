@@ -14,7 +14,7 @@
     "test:watch": "jest --watch",
     "test:spec": "jest --coverage",
     "test": "npm run -s lint && npm run -s build && npm run -s test:spec",
-    "prepublish": "npm run build"
+    "prepare": "npm run build"
   },
   "repository": {
     "type": "git",
