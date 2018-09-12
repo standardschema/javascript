@@ -1,4 +1,6 @@
 export class AnyType {
+  type = 'Any'
+
   isAssignable(other: AnyType): other is AnyType {
     return other instanceof AnyType
   }
@@ -13,6 +15,8 @@ export class AnyType {
 }
 
 export class UnknownType extends AnyType {
+  type = 'Unknown'
+
   isAssignable(other: AnyType): other is UnknownType {
     return other instanceof UnknownType
   }
@@ -23,6 +27,8 @@ export class UnknownType extends AnyType {
 }
 
 export class NullType extends AnyType {
+  type = 'Null'
+
   isAssignable(other: AnyType): other is NullType {
     return other instanceof NullType
   }
@@ -33,6 +39,8 @@ export class NullType extends AnyType {
 }
 
 export class BooleanType extends AnyType {
+  type = 'Boolean'
+
   isAssignable(other: AnyType): other is BooleanType {
     return other instanceof BooleanType
   }
@@ -43,6 +51,8 @@ export class BooleanType extends AnyType {
 }
 
 export class StringType extends AnyType {
+  type = 'String'
+
   isAssignable(other: AnyType): other is StringType {
     return other instanceof StringType
   }
@@ -53,6 +63,8 @@ export class StringType extends AnyType {
 }
 
 export class NumberType extends AnyType {
+  type = 'Number'
+
   isAssignable(other: AnyType): other is NumberType {
     return other instanceof NumberType
   }
@@ -63,6 +75,8 @@ export class NumberType extends AnyType {
 }
 
 export class IntegerType extends NumberType {
+  type = 'Integer'
+
   isAssignable(other: AnyType): other is IntegerType {
     return other instanceof IntegerType
   }
@@ -73,6 +87,8 @@ export class IntegerType extends NumberType {
 }
 
 export class FloatType extends NumberType {
+  type = 'Float'
+
   isAssignable(other: AnyType): other is FloatType {
     return other instanceof FloatType
   }
@@ -83,6 +99,8 @@ export class FloatType extends NumberType {
 }
 
 export class DecimalType extends NumberType {
+  type = 'Decimal'
+
   isAssignable(other: AnyType): other is DecimalType {
     return other instanceof DecimalType
   }
@@ -93,6 +111,8 @@ export class DecimalType extends NumberType {
 }
 
 export class ListType<T extends AnyType> extends AnyType {
+  type = 'List'
+
   constructor(public items: T) {
     super()
   }
@@ -114,6 +134,8 @@ export class ListType<T extends AnyType> extends AnyType {
 }
 
 export class ObjectType extends AnyType {
+  type = 'Object'
+
   constructor(
     public properties: Map<string, AnyType>,
     public optionalProperties: Map<string, AnyType>
@@ -178,6 +200,8 @@ export class ObjectType extends AnyType {
 }
 
 export class DateType extends AnyType {
+  type = 'Date'
+
   isAssignable(other: AnyType): other is DateType {
     return other instanceof DateType
   }
@@ -188,6 +212,8 @@ export class DateType extends AnyType {
 }
 
 export class DateTimeType extends DateType {
+  type = 'DateTime'
+
   isAssignable(other: AnyType): other is DateTimeType {
     return other instanceof DateTimeType
   }
